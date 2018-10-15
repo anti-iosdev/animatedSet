@@ -8,327 +8,58 @@
 
 import UIKit
 
-@objc protocol ButtonDelegate {
-    // Defined in ViewController
-    func buttonWasPressed(_ sender: UIButton)
-}
-
-class SetCardView: UIView {
+@IBDesignable
+class SetCardView: UIView
+{
+    // need the weird didSet as the view must change if any of the values change
+    @IBInspectable // must be explicitly typed for interface builder
+    var rank: Int = 12 { didSet { setNeedsDisplay(); setNeedsLayout() } }
+    @IBInspectable
+    var suit: String = "❤️" { didSet { setNeedsDisplay(); setNeedsLayout() } }
+    @IBInspectable
+    var isFaceUp: Bool = true { didSet { setNeedsDisplay(); setNeedsLayout() } }
     
-    //-------------------------------------------------------------
-    // Animations
+    var faceCardScale: CGFloat = SizeRatio.faceCardImageSizeToBoundsSize { didSet { setNeedsDisplay() }}
     
-    @IBAction func animateButton(sender: UIButton) {
-        
-        sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
-        
-        UIView.animate(withDuration: 2.0,
-                       delay: 0,
-                       usingSpringWithDamping: CGFloat(0.20),
-                       initialSpringVelocity: CGFloat(6.0),
-                       options: UIView.AnimationOptions.allowUserInteraction,
-                       animations: {
-                        sender.transform = CGAffineTransform.identity
-        },
-                       completion: { Void in()  }
-        )
-    }
-    
-    
-    
-    
-    
-    //-------------------------------------------------------------
-    // Essential Definitions
-    
-    var deck = [SetCard]() { didSet { setNeedsDisplay(); setNeedsLayout() } }
-    var uglyColorSolution = 0 { didSet { setNeedsDisplay(); setNeedsLayout() } }
-    
-    let cardGridLayout = Grid.Layout.aspectRatio(Consts.cardAspectRatio)
-    lazy var cardGrid = Grid(layout: cardGridLayout, frame: bounds)
-    
-    //-------------------------------------------------------------
-    // Defining Variables
-    
-    var currentIndex: Int? {
-        didSet {
-            if let index = currentIndex {
-                currentCard = deck[index]
-                currentCardCell = cardGrid[index]
-            }
-        }
-    }
-    // set after currentIndex is set
-    var currentCard: SetCard? {
-        didSet {
-            if let card = currentCard {
-                cardCellMiniGridLayout = Grid.Layout.dimensions(rowCount: card.number.rawValue, columnCount: 1)
-            }
-        }
-    }
-    var cardCellMiniGridLayout: Grid.Layout?
-    var currentCardCell: CGRect? {
-        didSet {
-            if let rect = currentCardCell {
-                cardCellMini = cardCellMiniConverter(rect)
-                //cardButtons.append(createUIButton(rect))
-            }
-        }
-    }
-    var cardCellMini: CGRect? {
-        didSet {
-            if let layout = cardCellMiniGridLayout, let cardCell = cardCellMini {
-                cardCellMiniGrid = Grid(layout: layout, frame: cardCell)
-            }
-        }
-    }
-    var cardCellMiniGrid: Grid?
-    func cardCellMiniConverter(_ rect: CGRect) -> CGRect {
-        return CGRect(x: rect.minX+rect.width/4, y: rect.minY, width: rect.width-rect.width/2, height: rect.height)
-    }
-    
-    //-------------------------------------------------------------
-    // Button Code
-    
-    var cardButtons = [UIButton]()
-    
-    lazy var deckCopy = deck
-    var selectedButtonIndex: Int?
-    
-    var answerDelegate: ButtonDelegate?
-    @objc func someButtonPressed(_ sender: UIButton) {
-        animateButton(sender: sender)
-        selectedButtonIndex = Int((sender.titleLabel?.text)!)
-        answerDelegate?.buttonWasPressed(sender)
-    }
-    
-    private func createUIButton(_ rect: CGRect) -> UIButton {
-        let button = UIButton(frame: rect)
-        
-        button.setTitle(String(currentIndex!), for: UIControl.State.normal)
-        button.setTitleColor(UIColor.clear, for: UIControl.State.normal)
-        
-        button.layer.cornerRadius = 8.0
-        button.layer.borderWidth = 1.0
-        button.layer.borderColor = UIColor.gray.cgColor
-        
-        if deck[currentIndex!].isSelected {
-            button.layer.borderWidth = 3.0
-            button.layer.borderColor = UIColor.blue.cgColor
-        }
-        
-        if uglyColorSolution == 1 {
-            button.layer.borderColor = UIColor.green.cgColor
-        } else if uglyColorSolution == 2 {
-            button.layer.borderColor = UIColor.red.cgColor
-        }
-        
-        button.showsTouchWhenHighlighted = true
-        button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
-        button.addTarget(self, action: #selector(someButtonPressed), for: .touchUpInside)
-        
-        self.addSubview(button)
-        return button
-    }
-    
-    @objc func buttonAction(sender: UIButton!) {
-        //print("Button index: \(sender.titleLabel!)")
-        //print("\(cardButtons.count)")
-    }
-    
-    func buttonInitializer() {
-        for index in 0..<cardGrid.cellCount {
-            if deck[index].isFaceUp, !deck[index].isMatched {
-                if let cell = cardGrid[index] {
-                    currentIndex = index
-                    var button = createUIButton(currentCardCell!)
-                }
-            }
+    @objc func adjustFaceCardScale(byHandlingGestureRecognizedBy recognizer: UIPinchGestureRecognizer) {
+        switch recognizer.state {
+        case .changed,.ended:
+            faceCardScale *= recognizer.scale
+            recognizer.scale = 1.0
+        default: break
         }
     }
     
-    //-------------------------------------------------------------
-    // Laying Out Subviews
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // removes subviews from the superview
-        for view in self.subviews{
-            view.removeFromSuperview()
-        }
-        
-        // initialize the Grid whenever the layout changes
-        cardGrid = Grid(layout: cardGridLayout, frame: bounds)
-        cardGrid.cellCount = deck.filter() { $0.isFaceUp }.count
-        
-        // initialize buttons
-        buttonInitializer()
+    private func centeredAttributedString(_ string: String, fontSize: CGFloat) -> NSAttributedString {
+        var font = UIFont.preferredFont(forTextStyle: .body).withSize(fontSize)
+        // required for scaled fonts
+        font = UIFontMetrics(forTextStyle: .body).scaledFont(for: font)
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .center
+        return NSAttributedString(string: string, attributes: [.paragraphStyle:paragraphStyle,.font:font])
     }
     
-    //-------------------------------------------------------------
-    // Drawing Logic
-    
-    func drawStripes(_ cellRect: CGRect) {
-        //let center = CGPoint(x: cellRect.midX-shapeSize, y: cellRect.midY-shapeSize/2)
-        let width = cellRect.width*1.4
-        var stripeRect = CGRect(x: cellRect.minX-width*0.2, y: cellRect.minY, width: width, height: cellRect.height/2)
-        let path = UIBezierPath(rect: stripeRect)
-        path.lineWidth = 2.0
-        //UIColor.blue.setStroke()
-        path.stroke()
-        
-        stripeRect = CGRect(x: cellRect.minX-width*0.2, y: cellRect.midY-shapeSize/2, width: width, height: shapeSize)
-        let path2 = UIBezierPath(rect: stripeRect)
-        path2.lineWidth = 2.0
-        //UIColor.blue.setStroke()
-        path2.stroke()
+    private var cornerString: NSAttributedString {
+        return centeredAttributedString(rankString+"\n"+suit, fontSize: cornerFontSize)
     }
     
-    func drawShading(_ path: UIBezierPath, rect: CGRect) {
-        // check shading for cases: 1 = empty, 2 = fill, 3 = striped
-        if let card = currentCard {
-            let shading = card.shading.result
-            if shading == 1 {
-                UIColor.white.setFill()
-                path.fill()
-                card.color.result.setStroke()
-            } else if shading == 2 {
-                card.color.result.setFill()
-                path.fill()
-                //UIColor.black.setStroke()
-                card.color.result.setStroke()
-            } else if shading == 3 {
-                UIColor.white.setFill()
-                path.fill()
-                card.color.result.setStroke()
-                drawStripes(rect)
-                //UIColor.black.setStroke()
-            }
-        }
+    private lazy var upperLeftCornerLabel = createCornerLabel()
+    private lazy var lowerRightCornerLabel = createCornerLabel()
+    
+    private func createCornerLabel() -> UILabel {
+        let label = UILabel()
+        // 0 means it wont get cut off
+        label.numberOfLines = 0
+        addSubview(label)
+        return label
     }
     
-    func drawSquare(_ rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
-        let center = CGPoint(x: rect.midX-squareSize/2, y: rect.midY-squareSize/2)
-        let sizeRect = CGSize(width: squareSize, height: squareSize)
-        let drawnRect = CGRect(origin: center, size: sizeRect)
-        
-        let path = UIBezierPath(rect: drawnRect)
-        
-        // making sure of clipping
-        context!.saveGState()
-        path.addClip()
-        
-        drawShading(path, rect: rect)
-        
-        path.lineWidth = 3.0
-        path.stroke()
-        context!.restoreGState()
-    }
-    
-    func drawCircle(_ rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let path = UIBezierPath(arcCenter: center, radius: shapeSize, startAngle: 0, endAngle: 2*CGFloat.pi, clockwise: true)
-        
-        // making sure of clipping
-        context!.saveGState()
-        path.addClip()
-        
-        drawShading(path, rect: rect)
-        
-        path.lineWidth = 3.0
-        path.stroke()
-        context!.restoreGState()
-    }
-    
-    func drawSquiggle(_ rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
-        
-        // defining the circles
-        let centerSemiOne = CGPoint(x: rect.midX+shapeSize/2, y: rect.midY)
-        let centerSemiTwo = CGPoint(x: rect.midX-shapeSize/2, y: rect.midY)
-        
-        let pathSemiOne = UIBezierPath(arcCenter: centerSemiOne, radius: shapeSize, startAngle: 0, endAngle: CGFloat.pi*2, clockwise: true)
-        let pathSemiTwo = UIBezierPath(arcCenter: centerSemiTwo, radius: shapeSize, startAngle: 0, endAngle: CGFloat.pi*2, clockwise: false)
-        
-        let path = pathSemiOne
-        path.append(pathSemiTwo)
-        
-        // making sure of clipping
-        context!.saveGState()
-        path.addClip()
-        
-        drawShading(path, rect: rect)
-        
-        path.lineWidth = 3.0
-        path.stroke()
-        context!.restoreGState()
-    }
-    
-    func drawDiamond(_ rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
-        let center = CGPoint(x: rect.midX-squareSize/2, y: rect.midY-squareSize/2)
-        let sizeRect = CGSize(width: squareSize, height: squareSize)
-        let drawnRect = CGRect(origin: CGPoint(x: 0, y: 0), size: sizeRect)
-        
-        let path = UIBezierPath(rect: drawnRect)
-        
-        let diagonalHalf = squareSize/2
-        let pathRotation = CGAffineTransform(rotationAngle: CGFloat.pi/4)
-        let pathTranslation2 = CGAffineTransform(translationX: center.x, y: center.y)
-        let pathTranslation3 = CGAffineTransform(translationX: diagonalHalf, y: -diagonalHalf/2.5)
-        
-        path.apply(pathRotation)
-        path.apply(pathTranslation2)
-        path.apply(pathTranslation3)
-        
-        // making sure of clipping
-        context!.saveGState()
-        path.addClip()
-        
-        drawShading(path, rect: rect)
-        
-        path.lineWidth = 3.0
-        path.stroke()
-        context!.restoreGState()
-    }
-    
-    func drawOval(_ rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
-        let width = squareSize*1.5
-        let center = CGPoint(x: rect.midX-width/2, y: rect.midY-squareSize/2)
-        let sizeRect = CGSize(width: squareSize*1.5, height: squareSize)
-        let drawnRect = CGRect(origin: center, size: sizeRect)
-        
-        let path = UIBezierPath(ovalIn: drawnRect)
-        
-        // making sure of clipping
-        context!.saveGState()
-        path.addClip()
-        
-        drawShading(path, rect: rect)
-        
-        path.lineWidth = 3.0
-        path.stroke()
-        context!.restoreGState()
-    }
-    
-    func masterDrawFunction() {
-        if let card = currentCard, let cardGrid = cardCellMiniGrid {
-            for index in 0..<cardGrid.cellCount {
-                if let rect = cardGrid[index] {
-                    if card.symbol.result == 1 {
-                        drawSquiggle(rect)
-                    } else if card.symbol.result == 2 {
-                        drawDiamond(rect)
-                    } else if card.symbol.result == 3 {
-                        drawOval(rect)
-                    }
-                }
-            }
-        }
+    private func configureCornerLabel(_ label: UILabel) {
+        label.attributedText = cornerString
+        // clears its size
+        label.frame.size = CGSize.zero
+        label.sizeToFit()
+        label.isHidden = !isFaceUp
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -336,41 +67,139 @@ class SetCardView: UIView {
         setNeedsLayout()
     }
     
-    //-------------------------------------------------------------
-    // Draw Function
+    // this will always get called when laying stuff out
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        configureCornerLabel(upperLeftCornerLabel)
+        upperLeftCornerLabel.frame.origin = bounds.origin.offsetBy(dx: cornerOffset, dy: cornerOffset)
+        
+        configureCornerLabel(lowerRightCornerLabel)
+        lowerRightCornerLabel.transform = CGAffineTransform.identity
+            .translatedBy(x: lowerRightCornerLabel.frame.size.width, y: lowerRightCornerLabel.frame.size.height)
+            .rotated(by: CGFloat.pi)
+        lowerRightCornerLabel.frame.origin = CGPoint(x: bounds.maxX, y: bounds.maxY)
+            .offsetBy(dx: -cornerOffset, dy: -cornerOffset)
+            .offsetBy(dx: -lowerRightCornerLabel.frame.size.width, dy: -lowerRightCornerLabel.frame.size.height)
+    }
+    
+    private func drawPips()
+    {
+        let pipsPerRowForRank = [[0],[1],[1,1],[1,1,1],[2,2],[2,1,2],[2,2,2],[2,1,2,2],[2,2,2,2],[2,2,1,2,2],[2,2,2,2,2]]
+        
+        func createPipString(thatFits pipRect: CGRect) -> NSAttributedString {
+            let maxVerticalPipCount = CGFloat(pipsPerRowForRank.reduce(0) { max($1.count, $0) })
+            let maxHorizontalPipCount = CGFloat(pipsPerRowForRank.reduce(0) { max($1.max() ?? 0, $0) })
+            let verticalPipRowSpacing = pipRect.size.height / maxVerticalPipCount
+            let attemptedPipString = centeredAttributedString(suit, fontSize: verticalPipRowSpacing)
+            let probablyOkayPipStringFontSize = verticalPipRowSpacing / (attemptedPipString.size().height /
+                verticalPipRowSpacing)
+            let probablyOkayPipString = centeredAttributedString(suit, fontSize: probablyOkayPipStringFontSize)
+            if probablyOkayPipString.size().width > pipRect.size.width / maxHorizontalPipCount {
+                return centeredAttributedString(suit, fontSize: probablyOkayPipStringFontSize /
+                    (probablyOkayPipString.size().width / (pipRect.size.width / maxHorizontalPipCount)))
+            } else {
+                return probablyOkayPipString
+            }
+        }
+        
+        if pipsPerRowForRank.indices.contains(rank) {
+            let pipsPerRow = pipsPerRowForRank[rank]
+            var pipRect = bounds.insetBy(dx: cornerOffset, dy: cornerOffset).insetBy(dx: cornerString.size().width, dy:
+                cornerString.size().height / 2)
+            let pipString = createPipString(thatFits: pipRect)
+            let pipRowSpacing = pipRect.size.height / CGFloat(pipsPerRow.count)
+            pipRect.size.height = pipString.size().height
+            pipRect.origin.y += (pipRowSpacing - pipRect.size.height) / 2
+            for pipCount in pipsPerRow {
+                switch pipCount {
+                case 1:
+                    pipString.draw(in: pipRect)
+                case 2:
+                    pipString.draw(in: pipRect.leftHalf)
+                    pipString.draw(in: pipRect.rightHalf)
+                default:
+                    break
+                }
+                pipRect.origin.y += pipRowSpacing
+            }
+        }
+    }
     
     override func draw(_ rect: CGRect) {
+        let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+        // prevents drawing outside of rectangle
+        roundedRect.addClip()
+        UIColor.white.setFill()
+        roundedRect.fill()
         
-        for index in 0..<cardGrid.cellCount {
-            if let cell = cardGrid[index] {
-                // draw in the grid
-                //let path = UIBezierPath(rect: cell)
-                //path.lineWidth = 2.0
-                //UIColor.gray.setStroke()
-                //path.stroke()
-                
-                // draw shapes in the grid
-                currentIndex = index
-                masterDrawFunction()
+        if isFaceUp {
+            if let faceCardImage = UIImage(named: rankString+suit, in: Bundle(for:
+                self.classForCoder), compatibleWith: traitCollection) {
+                faceCardImage.draw(in: bounds.zoom(by: faceCardScale))
+            } else {
+                drawPips()
+            }
+        } else {
+            if let cardBackImage = UIImage(named: "hearthstoneCardback", in: Bundle(for:
+                self.classForCoder), compatibleWith: traitCollection) {
+                cardBackImage.draw(in: bounds)
             }
         }
     }
 }
 
 extension SetCardView {
-    private struct Consts {
-        static let cellCount: Int = 81
-        static let cardAspectRatio: CGFloat = 1/1.586
-        static let centerFontSizeToBoundsHeight: CGFloat = 0.4
-        static let shapeRatio: CGFloat = 0.2
+    // how to constants in swift
+    private struct SizeRatio {
+        static let cornerFontSizeToBoundsHeight: CGFloat = 0.085
+        static let cornerRadiusToBoundsHeight: CGFloat = 0.06
+        static let cornerOffsetToCornerRadius: CGFloat = 0.33
+        static let faceCardImageSizeToBoundsSize: CGFloat = 0.75
     }
-    private var centerFontSize: CGFloat {
-        return cardGrid.cellSize.height * Consts.centerFontSizeToBoundsHeight
+    private var cornerRadius: CGFloat {
+        return bounds.size.height * SizeRatio.cornerRadiusToBoundsHeight
     }
-    private var shapeSize: CGFloat {
-        return cardGrid.cellSize.width * Consts.shapeRatio
+    private var cornerOffset: CGFloat {
+        return cornerRadius * SizeRatio.cornerOffsetToCornerRadius
     }
-    private var squareSize: CGFloat {
-        return shapeSize*1.5
+    private var cornerFontSize: CGFloat {
+        return bounds.size.height * SizeRatio.cornerFontSizeToBoundsHeight
+    }
+    private var rankString: String {
+        switch rank {
+        case 1: return "A"
+        case 2...10: return String(rank)
+        case 11: return "J"
+        case 12: return "Q"
+        case 13: return "K"
+        default: return "?"
+        }
+    }
+}
+
+extension CGRect {
+    var leftHalf: CGRect {
+        return CGRect(x: minX, y: minY, width: width/2, height: height)
+    }
+    var rightHalf: CGRect {
+        return CGRect(x: midX, y: minY, width: width/2, height: height)
+    }
+    func inset(by size: CGSize) -> CGRect {
+        return insetBy(dx: size.width, dy: size.height)
+    }
+    func sized(to size: CGSize) -> CGRect {
+        return CGRect(origin: origin, size: size)
+    }
+    func zoom(by scale: CGFloat) -> CGRect {
+        let newWidth = width * scale
+        let newHeight = height * scale
+        return insetBy(dx: (width - newWidth) / 2, dy: (height - newHeight) / 2)
+    }
+}
+
+extension CGPoint {
+    func offsetBy(dx: CGFloat, dy: CGFloat) -> CGPoint {
+        return CGPoint(x: x+dx, y: y+dy)
     }
 }

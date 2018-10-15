@@ -10,16 +10,32 @@ import UIKit
 
 class ViewController: UIViewController, ButtonDelegate {
 
-    @objc func buttonWasPressed(_ sender: UIButton) {
-
-    }
+    //-------------------------------------------------------------
+    // Definitions
     
     var deck = SetCardDeck().cards
+    lazy var cards = debugDeck()
     
-    @IBOutlet weak var setCardView: SetCardView! {
-        didSet {
-            setCardView.deck = deck
+    func debugDeck() -> [SetCard] {
+        cards = [SetCard]()
+        for index in deck.indices {
+            if index < 12 {
+                cards.append(deck[index])
+            }
         }
+        return cards
+    }
+    
+    @IBOutlet weak var setCardView: SetCardBoard! {
+        didSet {
+            setCardView.deck = cards
+        }
+    }
+    
+    //-------------------------------------------------------------
+    // Delegate
+    @objc func buttonWasPressed() {
+        
     }
     
     
