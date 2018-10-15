@@ -15,6 +15,7 @@ class SetCardView: UIView
     // Definitions
     
     var currentCard: SetCard!
+    var index: Int?
     
     //-------------------------------------------------------------
     // Gridding
@@ -29,6 +30,56 @@ class SetCardView: UIView
         let layout = Grid.Layout.dimensions(rowCount: currentCard.number.rawValue, columnCount: 1)
         let cardGrid = Grid(layout: layout, frame: bounds)
         return cardGrid
+    }
+    
+    //-------------------------------------------------------------
+    // Animations
+    
+    lazy var animator = UIDynamicAnimator(referenceView: self)
+    
+    lazy var cardBehavior = CardBehavior(in: animator)
+    
+    @objc func flipCard(_ recognizer: UITapGestureRecognizer) {
+        switch recognizer.state {
+        case .ended:
+            if let chosenCardView = recognizer.view as? SetCardView {
+                cardBehavior.removeItem(chosenCardView)
+                UIView.transition(with: chosenCardView,
+                                  duration: 0.5,
+                                  options: [.transitionFlipFromLeft],
+                                  animations: {
+                                    chosenCardView.isFaceUp = !chosenCardView.isFaceUp
+                },
+                                  completion: { Void in() }
+                )
+            }
+        default:
+            break
+        }
+    }
+    
+    @objc func tapCard(_ recognizer: UITapGestureRecognizer) {
+        switch recognizer.state {
+        case .ended:
+            if let chosenCardView = recognizer.view as? SetCardView {
+                cardBehavior.removeItem(chosenCardView)
+                UIView.animate(withDuration: 0.5,
+                               delay: 0,
+                               options: [.curveEaseInOut],
+                               animations: {
+                                self.frame = CGRect(x: self.frame.origin.x, y: 20, width: self.frame.width, height: self.frame.height)
+                },
+                               completion: nil )
+            }
+        default:
+            break
+        }
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
     }
     
     //-------------------------------------------------------------
@@ -254,21 +305,7 @@ class SetCardView: UIView
         setNeedsLayout()
     }
     
-    // this will always get called when laying stuff out
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-//        configureCornerLabel(upperLeftCornerLabel)
-//        upperLeftCornerLabel.frame.origin = bounds.origin.offsetBy(dx: cornerOffset, dy: cornerOffset)
-//
-//        configureCornerLabel(lowerRightCornerLabel)
-//        lowerRightCornerLabel.transform = CGAffineTransform.identity
-//            .translatedBy(x: lowerRightCornerLabel.frame.size.width, y: lowerRightCornerLabel.frame.size.height)
-//            .rotated(by: CGFloat.pi)
-//        lowerRightCornerLabel.frame.origin = CGPoint(x: bounds.maxX, y: bounds.maxY)
-//            .offsetBy(dx: -cornerOffset, dy: -cornerOffset)
-//            .offsetBy(dx: -lowerRightCornerLabel.frame.size.width, dy: -lowerRightCornerLabel.frame.size.height)
-    }
+
     
     private func drawPips()
     {

@@ -43,27 +43,23 @@ class SetCardBoard: UIView {
     var cardViews: [SetCardView]?
     var cardTest = SetCardView()
     
-    func configureCardViews() {
-        if let cardViews = cardViews {
-            for cardView in cardViews {
-                cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
-            }
-        }
+    func configureCardView(_ rect: CGRect) {
+        let cardView = SetCardView(frame: rect)
+        
+        cardView.index = currentIndex
+        cardView.currentCard = currentCard
+        //cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
+        //cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapCard(_:))))
+
+        addSubview(cardView)
     }
     
-    func configureCardViews2() {
+    func configureAllCardViews() {
         for index in 0..<cardGrid.cellCount {
             if deck[index].isFaceUp, !deck[index].isMatched {
-                if let cell = cardGrid[index] {
+                if let rect = cardGrid[index] {
                     currentIndex = index
-                    
-                    let cardView = SetCardView(frame: cell)
-                    
-                    cardView.currentCard = currentCard
-                    
-                    cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
-                    
-                    addSubview(cardView)
+                    configureCardView(rect)
                 }
             }
         }
@@ -76,19 +72,38 @@ class SetCardBoard: UIView {
     
     lazy var cardBehavior = CardBehavior(in: animator)
     
-    @objc func flipCard(_ recognizer: UITapGestureRecognizer) {
+//    @objc func flipCard(_ recognizer: UITapGestureRecognizer) {
+//        switch recognizer.state {
+//        case .ended:
+//            if let chosenCardView = recognizer.view as? SetCardView {
+//                cardBehavior.removeItem(chosenCardView)
+//                UIView.transition(with: chosenCardView,
+//                                  duration: 0.5,
+//                                  options: [.transitionFlipFromLeft],
+//                                  animations: {
+//                                    chosenCardView.isFaceUp = !chosenCardView.isFaceUp
+//                },
+//                                  completion: { Void in() }
+//                )
+//            }
+//        default:
+//            break
+//        }
+//    }
+
+    
+    @objc func tapCard(_ recognizer: UITapGestureRecognizer) {
         switch recognizer.state {
         case .ended:
             if let chosenCardView = recognizer.view as? SetCardView {
                 cardBehavior.removeItem(chosenCardView)
-                UIView.transition(with: chosenCardView,
-                                  duration: 0.5,
-                                  options: [.transitionFlipFromLeft],
-                                  animations: {
-                                    chosenCardView.isFaceUp = !chosenCardView.isFaceUp
+                UIView.animate(withDuration: 0.5,
+                               delay: 0,
+                               options: [.curveEaseInOut],
+                               animations: {
+                                self.frame = CGRect(x: self.frame.origin.x, y: 20, width: self.frame.width, height: self.frame.height)
                 },
-                                  completion: { Void in() }
-                )
+                               completion: nil)
             }
         default:
             break
@@ -124,7 +139,7 @@ class SetCardBoard: UIView {
         cardGrid.cellCount = deck.filter() { $0.isFaceUp }.count
         
         // initialization of drawing
-        configureCardViews2()
+        configureAllCardViews()
     }
 }
 
