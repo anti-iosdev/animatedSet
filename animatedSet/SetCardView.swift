@@ -330,7 +330,7 @@ class SetCardView: UIView
     }
     
     override func draw(_ rect: CGRect) {
-        
+
         let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         // prevents drawing outside of rectangle
         roundedRect.addClip()
@@ -338,7 +338,7 @@ class SetCardView: UIView
         roundedRect.fill()
         
         faceDrawer()
-        //        if isFaceUp {
+//        if isFaceUp {
 //            if let faceCardImage = UIImage(named: rankString+suit, in: Bundle(for:
 //                self.classForCoder), compatibleWith: traitCollection) {
 //                faceCardImage.draw(in: bounds.zoom(by: faceCardScale))
