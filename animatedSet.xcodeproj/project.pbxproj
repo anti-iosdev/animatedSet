@@ -16,6 +16,7 @@
 		E9317201217372DE00E43449 /* SetCardDeck.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9317200217372DE00E43449 /* SetCardDeck.swift */; };
 		E931720321748D5900E43449 /* SetCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E931720221748D5900E43449 /* SetCardView.swift */; };
 		E931720521748D7500E43449 /* Grid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E931720421748D7500E43449 /* Grid.swift */; };
+		E93172092174D24F00E43449 /* CardBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93172082174D24F00E43449 /* CardBehavior.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		E9317200217372DE00E43449 /* SetCardDeck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardDeck.swift; sourceTree = "<group>"; };
 		E931720221748D5900E43449 /* SetCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardView.swift; sourceTree = "<group>"; };
 		E931720421748D7500E43449 /* Grid.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Grid.swift; sourceTree = "<group>"; };
+		E93172082174D24F00E43449 /* CardBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardBehavior.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 			children = (
 				E93171ED21734BED00E43449 /* ViewController.swift */,
 				E931720221748D5900E43449 /* SetCardView.swift */,
+				E93172082174D24F00E43449 /* CardBehavior.swift */,
 				E93171FE217372C200E43449 /* SetCard.swift */,
 				E9317200217372DE00E43449 /* SetCardDeck.swift */,
 				E93171EF21734BED00E43449 /* Main.storyboard */,
@@ -161,6 +164,7 @@
 				E93171EE21734BED00E43449 /* ViewController.swift in Sources */,
 				E93171EC21734BED00E43449 /* AppDelegate.swift in Sources */,
 				E931720521748D7500E43449 /* Grid.swift in Sources */,
+				E93172092174D24F00E43449 /* CardBehavior.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

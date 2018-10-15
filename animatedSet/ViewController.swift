@@ -8,20 +8,13 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, ButtonDelegate {
 
-    var deck = SetCardDeck().cards
-//    lazy var cards = shuffledDeck()
+    @objc func buttonWasPressed(_ sender: UIButton) {
+
+    }
     
-//    func shuffledDeck() -> [SetCard] {
-//        var cards = [SetCard]()
-//        for _ in deck.cards.indices {
-//            if let card = deck.draw() {
-//                cards.append(card)
-//            }
-//        }
-//        return cards
-//    }
+    var deck = SetCardDeck().cards
     
     @IBOutlet weak var setCardView: SetCardView! {
         didSet {
@@ -32,6 +25,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setCardView.answerDelegate = self
     }
 }
 

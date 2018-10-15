@@ -8,15 +8,39 @@
 
 import UIKit
 
-@objc protocol AnswerDelegate {
+@objc protocol ButtonDelegate {
     // Defined in ViewController
-    func buttonWasPressed()
+    func buttonWasPressed(_ sender: UIButton)
 }
 
 class SetCardView: UIView {
     
     //-------------------------------------------------------------
+    // Animations
+    
+    @IBAction func animateButton(sender: UIButton) {
+        
+        sender.transform = CGAffineTransform(scaleX: 0.6, y: 0.6)
+        
+        UIView.animate(withDuration: 2.0,
+                       delay: 0,
+                       usingSpringWithDamping: CGFloat(0.20),
+                       initialSpringVelocity: CGFloat(6.0),
+                       options: UIView.AnimationOptions.allowUserInteraction,
+                       animations: {
+                        sender.transform = CGAffineTransform.identity
+        },
+                       completion: { Void in()  }
+        )
+    }
+    
+    
+    
+    
+    
+    //-------------------------------------------------------------
     // Essential Definitions
+    
     var deck = [SetCard]() { didSet { setNeedsDisplay(); setNeedsLayout() } }
     var uglyColorSolution = 0 { didSet { setNeedsDisplay(); setNeedsLayout() } }
     
@@ -71,10 +95,11 @@ class SetCardView: UIView {
     lazy var deckCopy = deck
     var selectedButtonIndex: Int?
     
-    var answerDelegate: AnswerDelegate?
+    var answerDelegate: ButtonDelegate?
     @objc func someButtonPressed(_ sender: UIButton) {
+        animateButton(sender: sender)
         selectedButtonIndex = Int((sender.titleLabel?.text)!)
-        answerDelegate?.buttonWasPressed()
+        answerDelegate?.buttonWasPressed(sender)
     }
     
     private func createUIButton(_ rect: CGRect) -> UIButton {
