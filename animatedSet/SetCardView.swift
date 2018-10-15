@@ -11,6 +11,193 @@ import UIKit
 @IBDesignable
 class SetCardView: UIView
 {
+    //-------------------------------------------------------------
+    // Definitions
+    
+    var currentCard: SetCard!
+    
+    //-------------------------------------------------------------
+    // Gridding
+    
+    lazy var drawingBoundsRect = drawingBoundsRectConverter(bounds)
+    lazy var cardGrid = gridConverter(drawingBoundsRect)
+    
+    func drawingBoundsRectConverter(_ rect: CGRect) -> CGRect {
+        return CGRect(x: rect.minX+rect.width/4, y: rect.minY, width: rect.width-rect.width/2, height: rect.height)
+    }
+    func gridConverter(_ rect: CGRect) -> Grid {
+        let layout = Grid.Layout.dimensions(rowCount: currentCard.number.rawValue, columnCount: 1)
+        let cardGrid = Grid(layout: layout, frame: bounds)
+        return cardGrid
+    }
+    
+    //-------------------------------------------------------------
+    // Drawing Code
+    
+    func drawStripes(_ cellRect: CGRect) {
+        //let center = CGPoint(x: cellRect.midX-shapeSize, y: cellRect.midY-shapeSize/2)
+        let width = cellRect.width*1.4
+        var stripeRect = CGRect(x: cellRect.minX-width*0.2, y: cellRect.minY, width: width, height: cellRect.height/2)
+        let path = UIBezierPath(rect: stripeRect)
+        path.lineWidth = 2.0
+        //UIColor.blue.setStroke()
+        path.stroke()
+        
+        stripeRect = CGRect(x: cellRect.minX-width*0.2, y: cellRect.midY-shapeSize/2, width: width, height: shapeSize)
+        let path2 = UIBezierPath(rect: stripeRect)
+        path2.lineWidth = 2.0
+        //UIColor.blue.setStroke()
+        path2.stroke()
+    }
+    
+    func drawShading(_ path: UIBezierPath, rect: CGRect) {
+        // check shading for cases: 1 = empty, 2 = fill, 3 = striped
+        if let card = currentCard {
+            let shading = card.shading.result
+            if shading == 1 {
+                UIColor.white.setFill()
+                path.fill()
+                card.color.result.setStroke()
+            } else if shading == 2 {
+                card.color.result.setFill()
+                path.fill()
+                //UIColor.black.setStroke()
+                card.color.result.setStroke()
+            } else if shading == 3 {
+                UIColor.white.setFill()
+                path.fill()
+                card.color.result.setStroke()
+                drawStripes(rect)
+                //UIColor.black.setStroke()
+            }
+        }
+    }
+    
+    func drawSquare(_ rect: CGRect) {
+        let context = UIGraphicsGetCurrentContext()
+        let center = CGPoint(x: rect.midX-squareSize/2, y: rect.midY-squareSize/2)
+        let sizeRect = CGSize(width: squareSize, height: squareSize)
+        let drawnRect = CGRect(origin: center, size: sizeRect)
+        
+        let path = UIBezierPath(rect: drawnRect)
+        
+        // making sure of clipping
+        context!.saveGState()
+        path.addClip()
+        
+        drawShading(path, rect: rect)
+        
+        path.lineWidth = 3.0
+        path.stroke()
+        context!.restoreGState()
+    }
+    
+    func drawCircle(_ rect: CGRect) {
+        let context = UIGraphicsGetCurrentContext()
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let path = UIBezierPath(arcCenter: center, radius: shapeSize, startAngle: 0, endAngle: 2*CGFloat.pi, clockwise: true)
+        
+        // making sure of clipping
+        context!.saveGState()
+        path.addClip()
+        
+        drawShading(path, rect: rect)
+        
+        path.lineWidth = 3.0
+        path.stroke()
+        context!.restoreGState()
+    }
+    
+    func drawSquiggle(_ rect: CGRect) {
+        let context = UIGraphicsGetCurrentContext()
+        
+        // defining the circles
+        let centerSemiOne = CGPoint(x: rect.midX+shapeSize/2, y: rect.midY)
+        let centerSemiTwo = CGPoint(x: rect.midX-shapeSize/2, y: rect.midY)
+        
+        let pathSemiOne = UIBezierPath(arcCenter: centerSemiOne, radius: shapeSize, startAngle: 0, endAngle: CGFloat.pi*2, clockwise: true)
+        let pathSemiTwo = UIBezierPath(arcCenter: centerSemiTwo, radius: shapeSize, startAngle: 0, endAngle: CGFloat.pi*2, clockwise: false)
+        
+        let path = pathSemiOne
+        path.append(pathSemiTwo)
+        
+        // making sure of clipping
+        context!.saveGState()
+        path.addClip()
+        
+        drawShading(path, rect: rect)
+        
+        path.lineWidth = 3.0
+        path.stroke()
+        context!.restoreGState()
+    }
+    
+    func drawDiamond(_ rect: CGRect) {
+        let context = UIGraphicsGetCurrentContext()
+        let center = CGPoint(x: rect.midX-squareSize/2, y: rect.midY-squareSize/2)
+        let sizeRect = CGSize(width: squareSize, height: squareSize)
+        let drawnRect = CGRect(origin: CGPoint(x: 0, y: 0), size: sizeRect)
+        
+        let path = UIBezierPath(rect: drawnRect)
+        
+        let diagonalHalf = squareSize/2
+        let pathRotation = CGAffineTransform(rotationAngle: CGFloat.pi/4)
+        let pathTranslation2 = CGAffineTransform(translationX: center.x, y: center.y)
+        let pathTranslation3 = CGAffineTransform(translationX: diagonalHalf, y: -diagonalHalf/2.5)
+        
+        path.apply(pathRotation)
+        path.apply(pathTranslation2)
+        path.apply(pathTranslation3)
+        
+        // making sure of clipping
+        context!.saveGState()
+        path.addClip()
+        
+        drawShading(path, rect: rect)
+        
+        path.lineWidth = 3.0
+        path.stroke()
+        context!.restoreGState()
+    }
+    
+    func drawOval(_ rect: CGRect) {
+        let context = UIGraphicsGetCurrentContext()
+        let width = squareSize*1.5
+        let center = CGPoint(x: rect.midX-width/2, y: rect.midY-squareSize/2)
+        let sizeRect = CGSize(width: squareSize*1.5, height: squareSize)
+        let drawnRect = CGRect(origin: center, size: sizeRect)
+        
+        let path = UIBezierPath(ovalIn: drawnRect)
+        
+        // making sure of clipping
+        context!.saveGState()
+        path.addClip()
+        
+        drawShading(path, rect: rect)
+        
+        path.lineWidth = 3.0
+        path.stroke()
+        context!.restoreGState()
+    }
+    
+    func masterDrawFunction() {
+        if let card = currentCard {
+            for index in 0..<cardGrid.cellCount {
+                if let rect = cardGrid[index] {
+                    if card.symbol.result == 1 {
+                        drawSquiggle(rect)
+                    } else if card.symbol.result == 2 {
+                        drawDiamond(rect)
+                    } else if card.symbol.result == 3 {
+                        drawOval(rect)
+                    }
+                }
+            }
+        }
+    }
+    
+    //-------------------------------------------------------------
+    
     // need the weird didSet as the view must change if any of the values change
     @IBInspectable // must be explicitly typed for interface builder
     var rank: Int = 12 { didSet { setNeedsDisplay(); setNeedsLayout() } }
@@ -71,16 +258,16 @@ class SetCardView: UIView
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        configureCornerLabel(upperLeftCornerLabel)
-        upperLeftCornerLabel.frame.origin = bounds.origin.offsetBy(dx: cornerOffset, dy: cornerOffset)
-        
-        configureCornerLabel(lowerRightCornerLabel)
-        lowerRightCornerLabel.transform = CGAffineTransform.identity
-            .translatedBy(x: lowerRightCornerLabel.frame.size.width, y: lowerRightCornerLabel.frame.size.height)
-            .rotated(by: CGFloat.pi)
-        lowerRightCornerLabel.frame.origin = CGPoint(x: bounds.maxX, y: bounds.maxY)
-            .offsetBy(dx: -cornerOffset, dy: -cornerOffset)
-            .offsetBy(dx: -lowerRightCornerLabel.frame.size.width, dy: -lowerRightCornerLabel.frame.size.height)
+//        configureCornerLabel(upperLeftCornerLabel)
+//        upperLeftCornerLabel.frame.origin = bounds.origin.offsetBy(dx: cornerOffset, dy: cornerOffset)
+//
+//        configureCornerLabel(lowerRightCornerLabel)
+//        lowerRightCornerLabel.transform = CGAffineTransform.identity
+//            .translatedBy(x: lowerRightCornerLabel.frame.size.width, y: lowerRightCornerLabel.frame.size.height)
+//            .rotated(by: CGFloat.pi)
+//        lowerRightCornerLabel.frame.origin = CGPoint(x: bounds.maxX, y: bounds.maxY)
+//            .offsetBy(dx: -cornerOffset, dy: -cornerOffset)
+//            .offsetBy(dx: -lowerRightCornerLabel.frame.size.width, dy: -lowerRightCornerLabel.frame.size.height)
     }
     
     private func drawPips()
@@ -126,26 +313,44 @@ class SetCardView: UIView
         }
     }
     
-    override func draw(_ rect: CGRect) {
-        let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
-        // prevents drawing outside of rectangle
-        roundedRect.addClip()
-        UIColor.white.setFill()
-        roundedRect.fill()
-        
+    //-------------------------------------------------------------
+    // Custom Code
+    
+    var drawnFaceCardImage: UIImage?
+    
+    func faceDrawer() {
         if isFaceUp {
-            if let faceCardImage = UIImage(named: rankString+suit, in: Bundle(for:
-                self.classForCoder), compatibleWith: traitCollection) {
-                faceCardImage.draw(in: bounds.zoom(by: faceCardScale))
-            } else {
-                drawPips()
-            }
+            masterDrawFunction()
         } else {
             if let cardBackImage = UIImage(named: "hearthstoneCardback", in: Bundle(for:
                 self.classForCoder), compatibleWith: traitCollection) {
                 cardBackImage.draw(in: bounds)
             }
         }
+    }
+    
+    override func draw(_ rect: CGRect) {
+        
+        let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+        // prevents drawing outside of rectangle
+        roundedRect.addClip()
+        UIColor.white.setFill()
+        roundedRect.fill()
+        
+        faceDrawer()
+        //        if isFaceUp {
+//            if let faceCardImage = UIImage(named: rankString+suit, in: Bundle(for:
+//                self.classForCoder), compatibleWith: traitCollection) {
+//                faceCardImage.draw(in: bounds.zoom(by: faceCardScale))
+//            } else {
+//                drawPips()
+//            }
+//        } else {
+//            if let cardBackImage = UIImage(named: "hearthstoneCardback", in: Bundle(for:
+//                self.classForCoder), compatibleWith: traitCollection) {
+//                cardBackImage.draw(in: bounds)
+//            }
+//        }
     }
 }
 
@@ -201,5 +406,23 @@ extension CGRect {
 extension CGPoint {
     func offsetBy(dx: CGFloat, dy: CGFloat) -> CGPoint {
         return CGPoint(x: x+dx, y: y+dy)
+    }
+}
+
+extension SetCardView {
+    private struct Consts {
+        static let cellCount: Int = 12
+        static let cardAspectRatio: CGFloat = 1/1.586
+        static let centerFontSizeToBoundsHeight: CGFloat = 0.4
+        static let shapeRatio: CGFloat = 0.2
+    }
+    private var centerFontSize: CGFloat {
+        return cardGrid.cellSize.height * Consts.centerFontSizeToBoundsHeight
+    }
+    private var shapeSize: CGFloat {
+        return cardGrid.cellSize.width * Consts.shapeRatio
+    }
+    private var squareSize: CGFloat {
+        return shapeSize*1.5
     }
 }

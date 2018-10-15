@@ -83,14 +83,46 @@ class SetCardBoard: UIView {
             if deck[index].isFaceUp, !deck[index].isMatched {
                 if let cell = cardGrid[index] {
                     currentIndex = index
+                    
                     let cardView = SetCardView(frame: cell)
+                    
+                    cardView.currentCard = currentCard
+                    
                     cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
+                    
                     addSubview(cardView)
                 }
             }
         }
     }
+    
+    //-------------------------------------------------------------
+    // UIView Images
 
+    func masterDrawFunctionV2() -> UIImage? {
+        if let card = currentCard, let cardGrid = cardCellMiniGrid {
+            
+            //let context = UIGraphicsGetCurrentContext()
+            UIGraphicsBeginImageContextWithOptions(cardGrid.cellSize, false, 0)
+            
+            for index in 0..<cardGrid.cellCount {
+                if let rect = cardGrid[index] {
+                    if card.symbol.result == 1 {
+                        drawSquiggle(rect)
+                    } else if card.symbol.result == 2 {
+                        drawDiamond(rect)
+                    } else if card.symbol.result == 3 {
+                        drawOval(rect)
+                    }
+                }
+            }
+            if let image = UIGraphicsGetImageFromCurrentImageContext() {
+                UIGraphicsEndImageContext()
+                return image
+            }
+        }
+        return nil
+    }
     
     //-------------------------------------------------------------
     // UIView Animations
@@ -362,6 +394,8 @@ class SetCardBoard: UIView {
             }
         }
     }
+    
+
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         setNeedsDisplay()
