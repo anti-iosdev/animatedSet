@@ -10,11 +10,28 @@ import UIKit
 
 class ViewController: UIViewController {
 
+    var deck = SetCardDeck().cards
+//    lazy var cards = shuffledDeck()
+    
+//    func shuffledDeck() -> [SetCard] {
+//        var cards = [SetCard]()
+//        for _ in deck.cards.indices {
+//            if let card = deck.draw() {
+//                cards.append(card)
+//            }
+//        }
+//        return cards
+//    }
+    
+    @IBOutlet weak var setCardView: SetCardView! {
+        didSet {
+            setCardView.deck = deck
+        }
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
     }
-
-
 }
 

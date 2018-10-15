@@ -35,15 +35,15 @@ struct SetCard
         case two
         case three
         
-        var result: String {
-            switch self {
-            case .one: return "▲"
-            case .two: return "●"
-            case .three: return "■"
-            }
-        }
+//        var result: String {
+//            switch self {
+//            case .one: return "▲"
+//            case .two: return "●"
+//            case .three: return "■"
+//            }
+//        }
         
-        var match: Int {
+        var result: Int {
             switch self {
             case .one: return 1
             case .two: return 2
@@ -68,13 +68,13 @@ struct SetCard
             }
         }
         
-        var match: Int {
-            switch self {
-            case .one: return 1
-            case .two: return 2
-            case .three: return 3
-            }
-        }
+//        var match: Int {
+//            switch self {
+//            case .one: return 1
+//            case .two: return 2
+//            case .three: return 3
+//            }
+//        }
         
         static var all = [Shading.one,.two,.three]
     }
@@ -99,8 +99,6 @@ struct SetCard
             case .three: return 3
             }
         }
-        
-        
         
         static var all = [Color.one,.two,.three]
     }
