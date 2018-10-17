@@ -47,6 +47,7 @@ class SetCardBoard: UIView, CardDelegate {
         
         cardView.index = currentIndex
         cardView.currentCard = currentCard
+        cardView.backgroundColor = UIColor.clear
         //cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
         //cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapCard(_:))))
 
@@ -64,39 +65,56 @@ class SetCardBoard: UIView, CardDelegate {
             }
         }
     }
-    
-    func configureCardViewV2(_ rect: CGRect) -> SetCardView {
-        let cardView = SetCardView(frame: rect)
-        cardView.index = currentIndex
-        cardView.currentCard = currentCard
+
+    func alterCardView(_ rect: CGRect) {
+        
+
+        cardViews[currentIndex!].frame = rect
         //cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
         //cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapCard(_:))))
         
         //addSubview(cardView)
         //cardViews.append(cardView)
-        
-        return cardView
     }
     
-    func configureAllCardViewsV2() {
+    func alterAllCardViews() {
         for index in 0..<cardGrid.cellCount {
             if deck[index].isFaceUp, !deck[index].isMatched {
                 if let rect = cardGrid[index] {
                     currentIndex = index
-                    let cardView = configureCardViewV2(rect)
-                    
-                    if cardViews.count > index {
-                        if cardViews[index].index == cardView.index {
-                            print("is already inside")
-                        }
-                    } else {
-                        addSubview(cardView)
-                        cardViews.append(cardView)
-                    }
+                    alterCardView(rect)
                 }
             }
         }
-        print("cardViews.count = \(cardViews.count)")
+    }
+    
+    
+    //-------------------------------------------------------------
+    // Laying Out Subviews
+    
+    
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // removes subviews from the superview
+//        for view in self.subviews{
+//            view.removeFromSuperview()
+//        }
+        
+        // initialize the Grid whenever the layout changes
+        cardGrid = Grid(layout: cardGridLayout, frame: bounds)
+        cardGrid.cellCount = deck.filter() { $0.isFaceUp }.count
+        
+        if cardViews.count == 0 {
+            configureAllCardViews()
+        } else {
+            alterAllCardViews()
+            print("configured!")
+        }
+        
+        print("\(cardViews.count)")
+        
     }
     
     //-------------------------------------------------------------
@@ -141,25 +159,6 @@ class SetCardBoard: UIView, CardDelegate {
                         cardView.frame = destination
         },
                        completion: nil )
-    }
- 
-    //-------------------------------------------------------------
-    // Laying Out Subviews
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // removes subviews from the superview
-        for view in self.subviews{
-            view.removeFromSuperview()
-        }
-        
-        // initialize the Grid whenever the layout changes
-        cardGrid = Grid(layout: cardGridLayout, frame: bounds)
-        cardGrid.cellCount = deck.filter() { $0.isFaceUp }.count
-        
-        configureAllCardViews()
-        
     }
 
     //-------------------------------------------------------------

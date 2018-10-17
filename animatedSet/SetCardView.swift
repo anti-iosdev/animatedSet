@@ -70,6 +70,16 @@ class SetCardView: UIView
                        completion: nil )
     }
     
+    @objc func tapCardV3(_ recognizer: UITapGestureRecognizer) {
+        switch recognizer.state {
+        case .ended:
+            
+            print("hi")
+        default:
+            break
+        }
+    }
+    
     @objc func tapCardV2(_ recognizer: UITapGestureRecognizer) {
         switch recognizer.state {
         case .ended:
@@ -130,7 +140,7 @@ class SetCardView: UIView
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapCard(_:))))
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
 
     }
     
@@ -310,6 +320,56 @@ class SetCardView: UIView
     }
     
     //-------------------------------------------------------------
+    // Custom Code
+    
+    var drawnFaceCardImage: UIImage?
+    
+    func faceDrawer() {
+        if isFaceUp {
+            masterDrawFunction()
+        } else {
+            if let cardBackImage = UIImage(named: "hearthstoneCardback", in: Bundle(for:
+                self.classForCoder), compatibleWith: traitCollection) {
+                cardBackImage.draw(in: bounds)
+            }
+        }
+    }
+    
+    func isSelected() {
+        if currentCard.isSelected {
+            
+        } else {
+            
+        }
+    }
+    
+    override func draw(_ rect: CGRect) {
+        
+        let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+        // prevents drawing outside of rectangle
+        roundedRect.addClip()
+        UIColor.white.setFill()
+        roundedRect.fill()
+        //self.frame = roundedRect
+        
+        
+        faceDrawer()
+        //        if isFaceUp {
+        //            if let faceCardImage = UIImage(named: rankString+suit, in: Bundle(for:
+        //                self.classForCoder), compatibleWith: traitCollection) {
+        //                faceCardImage.draw(in: bounds.zoom(by: faceCardScale))
+        //            } else {
+        //                drawPips()
+        //            }
+        //        } else {
+        //            if let cardBackImage = UIImage(named: "hearthstoneCardback", in: Bundle(for:
+        //                self.classForCoder), compatibleWith: traitCollection) {
+        //                cardBackImage.draw(in: bounds)
+        //            }
+        //        }
+    }
+    
+    //-------------------------------------------------------------
     
     // need the weird didSet as the view must change if any of the values change
     @IBInspectable // must be explicitly typed for interface builder
@@ -410,54 +470,6 @@ class SetCardView: UIView
                 pipRect.origin.y += pipRowSpacing
             }
         }
-    }
-    
-    //-------------------------------------------------------------
-    // Custom Code
-    
-    var drawnFaceCardImage: UIImage?
-    
-    func faceDrawer() {
-        if isFaceUp {
-            masterDrawFunction()
-        } else {
-            if let cardBackImage = UIImage(named: "hearthstoneCardback", in: Bundle(for:
-                self.classForCoder), compatibleWith: traitCollection) {
-                cardBackImage.draw(in: bounds)
-            }
-        }
-    }
-    
-    func isSelected() {
-        if currentCard.isSelected {
-            
-        } else {
-            
-        }
-    }
-    
-    override func draw(_ rect: CGRect) {
-
-        let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
-        // prevents drawing outside of rectangle
-        roundedRect.addClip()
-        UIColor.white.setFill()
-        roundedRect.fill()
-        
-        faceDrawer()
-//        if isFaceUp {
-//            if let faceCardImage = UIImage(named: rankString+suit, in: Bundle(for:
-//                self.classForCoder), compatibleWith: traitCollection) {
-//                faceCardImage.draw(in: bounds.zoom(by: faceCardScale))
-//            } else {
-//                drawPips()
-//            }
-//        } else {
-//            if let cardBackImage = UIImage(named: "hearthstoneCardback", in: Bundle(for:
-//                self.classForCoder), compatibleWith: traitCollection) {
-//                cardBackImage.draw(in: bounds)
-//            }
-//        }
     }
 }
 
