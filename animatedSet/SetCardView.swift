@@ -8,7 +8,11 @@
 
 import UIKit
 
-@IBDesignable
+@objc protocol CardDelegate {
+    // Defined in ViewController
+    func chooseCard()
+}
+
 class SetCardView: UIView
 {
     //-------------------------------------------------------------
@@ -16,6 +20,7 @@ class SetCardView: UIView
     
     var currentCard: SetCard!
     var index: Int?
+    var cardDelegate: CardDelegate?
     
     //-------------------------------------------------------------
     // Gridding
@@ -33,17 +38,78 @@ class SetCardView: UIView
     }
     
     //-------------------------------------------------------------
-    // Animations
+    // Animation
     
-    lazy var animator = UIDynamicAnimator(referenceView: self)
+    let cornerPoint = CGPoint(x: 0, y: 0)
+    let spawnCardAnimationDuration = 0.3
     
-    lazy var cardBehavior = CardBehavior(in: animator)
+    @objc func spawnCardSequential(initial: CGPoint, _ delay: Double) {
+        spawnCard(initial: initial, delay: delay)
+    }
+    
+    @objc func spawnCard(initial: CGPoint, delay: Double) {
+        let destination = self.frame
+        let origin = CGRect(x: initial.x, y: initial.y, width: self.frame.width, height: self.frame.height)
+        //cardView.frame = origin
+        UIView.animate(withDuration: 0,
+                       delay: 0,
+                       options: [.curveEaseOut],
+                       animations: {
+                        
+                        self.frame = origin
+        },
+                       completion: nil )
+        
+        UIView.animate(withDuration: spawnCardAnimationDuration,
+                       delay: delay,
+                       options: [.curveEaseOut],
+                       animations: {
+                        
+                        self.frame = destination
+        },
+                       completion: nil )
+    }
+    
+    @objc func tapCardV2(_ recognizer: UITapGestureRecognizer) {
+        switch recognizer.state {
+        case .ended:
+            if let chosenCardView = recognizer.view as? SetCardView {
+                //cardBehavior.removeItem(chosenCardView)
+                UIView.animate(withDuration: 0.75,
+                               delay: 0,
+                               options: [.curveEaseOut],
+                               animations: {
+                                self.frame = CGRect(x: self.frame.origin.x, y: self.frame.origin.y - self.frame.width/4, width: self.frame.width, height: self.frame.height)
+                },
+                               completion: nil )
+            }
+        default:
+            break
+        }
+    }
+    
+    @objc func tapCard(_ recognizer: UITapGestureRecognizer) {
+        switch recognizer.state {
+        case .ended:
+            if let chosenCardView = recognizer.view as? SetCardView {
+                //cardBehavior.removeItem(chosenCardView)
+                UIView.animate(withDuration: 0.75,
+                               delay: 0,
+                               options: [.curveEaseOut],
+                               animations: {
+                                self.frame = CGRect(x: self.frame.origin.x, y: self.frame.origin.y - self.frame.width/4, width: self.frame.width, height: self.frame.height)
+                },
+                               completion: nil )
+            }
+        default:
+            break
+        }
+    }
     
     @objc func flipCard(_ recognizer: UITapGestureRecognizer) {
         switch recognizer.state {
         case .ended:
             if let chosenCardView = recognizer.view as? SetCardView {
-                cardBehavior.removeItem(chosenCardView)
                 UIView.transition(with: chosenCardView,
                                   duration: 0.5,
                                   options: [.transitionFlipFromLeft],
@@ -58,29 +124,25 @@ class SetCardView: UIView
         }
     }
     
-    @objc func tapCard(_ recognizer: UITapGestureRecognizer) {
-        switch recognizer.state {
-        case .ended:
-            if let chosenCardView = recognizer.view as? SetCardView {
-                cardBehavior.removeItem(chosenCardView)
-                UIView.animate(withDuration: 0.5,
-                               delay: 0,
-                               options: [.curveEaseInOut],
-                               animations: {
-                                self.frame = CGRect(x: self.frame.origin.x, y: 20, width: self.frame.width, height: self.frame.height)
-                },
-                               completion: nil )
-            }
-        default:
-            break
-        }
-    }
+    //-------------------------------------------------------------
+    // Layout and Initialization
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapCard(_:))))
+
     }
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
     
     //-------------------------------------------------------------
     // Drawing Code
@@ -363,6 +425,14 @@ class SetCardView: UIView
                 self.classForCoder), compatibleWith: traitCollection) {
                 cardBackImage.draw(in: bounds)
             }
+        }
+    }
+    
+    func isSelected() {
+        if currentCard.isSelected {
+            
+        } else {
+            
         }
     }
     
