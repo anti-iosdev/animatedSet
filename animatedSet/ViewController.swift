@@ -13,6 +13,9 @@ class ViewController: UIViewController, ButtonDelegate {
     //-------------------------------------------------------------
     // Definitions
     
+    var game = SetGame(numberOfTotalSlots: 81)
+    
+    // debug deck
     var deck = SetCardDeck().cards
     lazy var cards = debugDeck()
     
@@ -37,11 +40,14 @@ class ViewController: UIViewController, ButtonDelegate {
     @objc func buttonWasPressed() {
         
     }
-    
+    @objc func drawButtonWasPressed() {
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setCardView.answerDelegate = self
+        setCardView.buttonDelegate = self
+        setCardView.drawButtonDelegate = self
     }
 }
 

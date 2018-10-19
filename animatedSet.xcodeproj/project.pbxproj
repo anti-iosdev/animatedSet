@@ -19,6 +19,7 @@
 		E93172092174D24F00E43449 /* CardBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93172082174D24F00E43449 /* CardBehavior.swift */; };
 		E931720B2174D8E400E43449 /* SetCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E931720A2174D8E400E43449 /* SetCardView.swift */; };
 		E931720D2174DCC300E43449 /* hearthstoneCardback.png in Resources */ = {isa = PBXBuildFile; fileRef = E931720C2174DCC300E43449 /* hearthstoneCardback.png */; };
+		E96374362179E9240032877D /* SetGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96374352179E9240032877D /* SetGame.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		E93172082174D24F00E43449 /* CardBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardBehavior.swift; sourceTree = "<group>"; };
 		E931720A2174D8E400E43449 /* SetCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardView.swift; sourceTree = "<group>"; };
 		E931720C2174DCC300E43449 /* hearthstoneCardback.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hearthstoneCardback.png; sourceTree = "<group>"; };
+		E96374352179E9240032877D /* SetGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGame.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 			children = (
 				E93171ED21734BED00E43449 /* ViewController.swift */,
 				E931720221748D5900E43449 /* SetCardBoard.swift */,
+				E96374352179E9240032877D /* SetGame.swift */,
 				E931720A2174D8E400E43449 /* SetCardView.swift */,
 				E93172082174D24F00E43449 /* CardBehavior.swift */,
 				E93171FE217372C200E43449 /* SetCard.swift */,
@@ -166,6 +169,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E93171FF217372C200E43449 /* SetCard.swift in Sources */,
+				E96374362179E9240032877D /* SetGame.swift in Sources */,
 				E931720321748D5900E43449 /* SetCardBoard.swift in Sources */,
 				E9317201217372DE00E43449 /* SetCardDeck.swift in Sources */,
 				E93171EE21734BED00E43449 /* ViewController.swift in Sources */,

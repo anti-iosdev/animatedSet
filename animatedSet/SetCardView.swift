@@ -83,7 +83,7 @@ class SetCardView: UIView
     @objc func tapCardV2(_ recognizer: UITapGestureRecognizer) {
         switch recognizer.state {
         case .ended:
-            if let chosenCardView = recognizer.view as? SetCardView {
+            if (recognizer.view as? SetCardView) != nil {
                 //cardBehavior.removeItem(chosenCardView)
                 UIView.animate(withDuration: 0.75,
                                delay: 0,
@@ -101,7 +101,7 @@ class SetCardView: UIView
     @objc func tapCard(_ recognizer: UITapGestureRecognizer) {
         switch recognizer.state {
         case .ended:
-            if let chosenCardView = recognizer.view as? SetCardView {
+            if (recognizer.view as? SetCardView) != nil {
                 //cardBehavior.removeItem(chosenCardView)
                 UIView.animate(withDuration: 0.75,
                                delay: 0,

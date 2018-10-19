@@ -11,6 +11,7 @@ import UIKit
 @objc protocol ButtonDelegate {
     // Defined in ViewController
     func buttonWasPressed()
+    func drawButtonWasPressed()
 }
 
 class SetCardBoard: UIView, CardDelegate {
@@ -88,42 +89,6 @@ class SetCardBoard: UIView, CardDelegate {
         }
     }
     
-    
-    //-------------------------------------------------------------
-    // Laying Out Subviews
-    
-    
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        // removes subviews from the superview
-//        for view in self.subviews{
-//            view.removeFromSuperview()
-//        }
-        
-        // initialize the Grid whenever the layout changes
-        cardGrid = Grid(layout: cardGridLayout, frame: bounds)
-        cardGrid.cellCount = deck.filter() { $0.isFaceUp }.count
-        
-        if cardViews.count == 0 {
-            configureAllCardViews()
-        } else {
-            alterAllCardViews()
-            print("configured!")
-        }
-        
-        print("\(cardViews.count)")
-        
-    }
-    
-    //-------------------------------------------------------------
-    // Card Delegation
-    
-    func chooseCard() {
-        
-    }
-    
     //-------------------------------------------------------------
     // UIView Animations
     
@@ -162,9 +127,96 @@ class SetCardBoard: UIView, CardDelegate {
     }
 
     //-------------------------------------------------------------
+    // Laying Out Subviews
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        // removes subviews from the superview
+        //        for view in self.subviews{
+        //            view.removeFromSuperview()
+        //        }
+        
+        // Button setup
+        let layout = Grid.Layout.dimensions(rowCount: 7, columnCount: 1)
+        let cardGridInitial = Grid(layout: layout, frame: bounds)
+        
+        if let buttonZone = cardGridInitial[6] {
+            let layout = Grid.Layout.dimensions(rowCount: 1, columnCount: 2)
+            let buttonGrid = Grid(layout: layout, frame: buttonZone)
+            configureButton(buttonGrid[0]!)
+        }
+        
+        // Grid setup
+        let cardBoardGridWidth = bounds.width
+        let cardBoardGridHeight = bounds.height*6/7
+        
+        let cardBoardGrid = CGRect(x: 0, y: 0, width: cardBoardGridWidth, height: cardBoardGridHeight)
+        
+        // initialize the Grid whenever the layout changes
+        cardGrid = Grid(layout: cardGridLayout, frame: cardBoardGrid)
+        cardGrid.cellCount = deck.filter() { $0.isFaceUp }.count
+        
+        if cardViews.count == 0 {
+            configureAllCardViews()
+        } else {
+            alterAllCardViews()
+        }
+        
+        // configureButton(cardGridInitial[6]!)
+    }
+    
+    //-------------------------------------------------------------
+    // Card Delegation
+    
+    func chooseCard() {
+        
+    }
+    
+    //-------------------------------------------------------------
+    // New Button Code
+    
+    
+    lazy var button = UIButton()
+    
+    func configureButton(_ rect: CGRect) {
+        //let buttonRect = CGRect(x: 0, y: 0, width: 100, height: 100)
+        let rectWidth = rect.size.width
+        let rectHeight = rect.size.height
+        let smallConst = CGFloat(0.4)
+        
+        func smallerSize() -> CGFloat {
+            if rect.width > rect.height*2 {
+                return rectHeight
+            } else {
+                return rectWidth*smallConst
+            }
+        }
+        
+        button.showsTouchWhenHighlighted = true
+        button.frame = rect
+        button.backgroundColor = UIColor.blue
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: smallerSize()/2)
+        button.setTitle("Deal", for: UIControl.State.normal)
+        button.addTarget(self, action: #selector(drawButtonWasPressed), for: .touchUpInside)
+
+        addSubview(button)
+        
+    }
+    
+    @objc func drawButtonWasPressed() {
+        drawButtonDelegate?.drawButtonWasPressed()
+    }
+    
+    func drawButton() {
+
+    }
+    
+    //-------------------------------------------------------------
     // Legacy Button Code
     
-    var answerDelegate: ButtonDelegate?
+    var drawButtonDelegate: ButtonDelegate?
+    var buttonDelegate: ButtonDelegate?
     
     /*
     @objc func someButtonPressed(_ sender: UIButton) {
