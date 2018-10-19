@@ -15,6 +15,7 @@ struct SetCard
     var symbol: Symbol
     var shading: Shading
     var color: Color
+    //var isSpawned = false
     
     var isFaceUp = false
     var isSelected = false

@@ -72,8 +72,8 @@
 			children = (
 				E93171ED21734BED00E43449 /* ViewController.swift */,
 				E931720221748D5900E43449 /* SetCardBoard.swift */,
-				E96374352179E9240032877D /* SetGame.swift */,
 				E931720A2174D8E400E43449 /* SetCardView.swift */,
+				E96374352179E9240032877D /* SetGame.swift */,
 				E93172082174D24F00E43449 /* CardBehavior.swift */,
 				E93171FE217372C200E43449 /* SetCard.swift */,
 				E9317200217372DE00E43449 /* SetCardDeck.swift */,

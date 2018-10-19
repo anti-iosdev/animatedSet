@@ -48,20 +48,24 @@ class SetGame
                     activeIndices!.append(index)
                     cards[index].isSelected = true
                 } else {
-                    // check for matching here
-                    // print("activeIndices = \(String(describing: activeIndices)), index = \(index)")
-                    
                     // we now have an array of the needed three to be compared
                     if var matchMaker = activeIndices {
                         matchMaker.append(index)
                         if setMatcher(matchMaker) {
-                            var uglyCountSolution = 0
-                            for index in cards.indices {
-                                if matchMaker.contains(index) {
-                                    cards.remove(at: index-uglyCountSolution)
-                                    uglyCountSolution += 1
-                                }
+                            //var uglyCountSolution = 0
+                            
+//                            for index in cards.indices {
+//                                if matchMaker.contains(index) {
+//                                    cards.remove(at: index-uglyCountSolution)
+//                                    uglyCountSolution += 1
+//                                }
+//                            }
+                            
+                            for index in matchMaker {
+                                cards[index].isMatched = true
                             }
+                            
+                            //cards[index].isSelected = false
                             print("A set was found!")
                             uglyColorSolution = 1
                             matchSuccess = 1
@@ -180,20 +184,35 @@ class SetGame
     
     //var voidCard = Card.init(number: one, symbol: one, shading: one, color: one, isFaceUp: false, isSelected: false, isMatched: false)
     
-    init(numberOfTotalSlots: Int) {
-        func shuffleCard() {
-            for index in deck.cards.indices {
-                if index >= 36 {
-                    var cardTemp = deck.draw()!
-                    cardTemp.isFaceUp = false
-                    cards.append(cardTemp)
-                }
-                else {
-                    cards.append(deck.draw()!)
-                }
+    func shuffleCardDebug() {
+        for index in deck.cards.indices {
+            var card = deck.cards[index]
+            if index >= 36 {
+                card.isFaceUp = false
+                cards.append(card)
+            }
+            else {
+                cards.append(card)
             }
         }
-        shuffleCard()
+    }
+    
+    func shuffleCard() {
+        for index in deck.cards.indices {
+            if index >= 36 {
+                var cardTemp = deck.draw()!
+                cardTemp.isFaceUp = false
+                cards.append(cardTemp)
+            }
+            else {
+                cards.append(deck.draw()!)
+            }
+        }
+    }
+    
+    init(numberOfTotalSlots: Int) {
+
+        shuffleCardDebug()
     }
 }
 

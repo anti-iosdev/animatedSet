@@ -10,7 +10,7 @@ import UIKit
 
 @objc protocol CardDelegate {
     // Defined in ViewController
-    func chooseCard()
+    func chooseCard(_ index: Int)
 }
 
 class SetCardView: UIView
@@ -18,9 +18,10 @@ class SetCardView: UIView
     //-------------------------------------------------------------
     // Definitions
     
-    var currentCard: SetCard!
+    var currentCard: SetCard! { didSet { setNeedsDisplay(); setNeedsLayout() } }
     var index: Int?
     var cardDelegate: CardDelegate?
+    //var isSpawned: Bool = false
     
     //-------------------------------------------------------------
     // Gridding
@@ -68,6 +69,15 @@ class SetCardView: UIView
                         self.frame = destination
         },
                        completion: nil )
+    }
+    
+    @objc func chooseCard(_ recognizer: UITapGestureRecognizer) {
+        switch recognizer.state {
+        case .ended:
+            cardDelegate?.chooseCard(index!)
+        default:
+            break
+        }
     }
     
     @objc func tapCardV3(_ recognizer: UITapGestureRecognizer) {
@@ -128,6 +138,7 @@ class SetCardView: UIView
                 },
                                   completion: { Void in() }
                 )
+                cardDelegate?.chooseCard(index!)
             }
         default:
             break
@@ -140,7 +151,7 @@ class SetCardView: UIView
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
+        self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(chooseCard(_:))))
 
     }
     
@@ -336,23 +347,39 @@ class SetCardView: UIView
     }
     
     func isSelected() {
-        if currentCard.isSelected {
+        if currentCard.isSelected == true {
+            let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+            roundedRect.addClip()
+            UIColor.white.setFill()
+            roundedRect.fill()
             
+            UIColor.black.setStroke()
+            roundedRect.lineWidth = 5.0
+            roundedRect.stroke()
         } else {
+            let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+            roundedRect.addClip()
+            UIColor.white.setFill()
+            roundedRect.fill()
             
+            UIColor.clear.setStroke()
+            roundedRect.lineWidth = 5.0
+            roundedRect.stroke()
         }
     }
     
     override func draw(_ rect: CGRect) {
-        
+        /*
         let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         // prevents drawing outside of rectangle
         roundedRect.addClip()
         UIColor.white.setFill()
         roundedRect.fill()
+        */
         //self.frame = roundedRect
+        //print("currentCard.isSelected = \(currentCard.isSelected)")
         
-        
+        isSelected()
         faceDrawer()
         //        if isFaceUp {
         //            if let faceCardImage = UIImage(named: rankString+suit, in: Bundle(for:

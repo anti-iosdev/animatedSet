@@ -31,7 +31,7 @@ class ViewController: UIViewController, ButtonDelegate {
     
     @IBOutlet weak var setCardView: SetCardBoard! {
         didSet {
-            setCardView.deck = cards
+            setCardView.deck = game.cards
         }
     }
     
@@ -41,13 +41,33 @@ class ViewController: UIViewController, ButtonDelegate {
         
     }
     @objc func drawButtonWasPressed() {
-        
+        print("drawButton @ viewcontroller")
     }
     
+    @objc func chooseCard(_ index: Int) {
+        print("card: \(index) @ viewcontroller")
+        game.chooseCard(at: index)
+        updateViewFromModel()
+    }
+    
+    //-------------------------------------------------------------
+    // Update View From Model
+    
+    func updateViewFromModel() {
+        setCardView.deck = game.cards
+    }
+    
+    
+    
+    
+    
+    //-------------------------------------------------------------
+    // Override func
     override func viewDidLoad() {
         super.viewDidLoad()
         setCardView.buttonDelegate = self
         setCardView.drawButtonDelegate = self
+        
     }
 }
 
