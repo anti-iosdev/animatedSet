@@ -23,6 +23,11 @@ class SetCardView: UIView
     var cardDelegate: CardDelegate?
     //var isSpawned: Bool = false
     
+    func redraw() {
+        setNeedsDisplay()
+        setNeedsLayout()
+    }
+    
     //-------------------------------------------------------------
     // Gridding
     
@@ -43,6 +48,77 @@ class SetCardView: UIView
     
     let cornerPoint = CGPoint(x: 0, y: 0)
     let spawnCardAnimationDuration = 0.3
+    
+    @objc func moveCard(_ starting: CGRect, delay: Double) {
+        let ending = self.frame
+        UIView.animate(withDuration: 0,
+                       delay: 0,
+                       options: [.curveEaseOut],
+                       animations: {
+                        
+                        self.frame = starting
+        },
+                       completion: nil )
+        
+        UIView.animate(withDuration: 0.3,
+                       delay: delay,
+                       options: [.curveEaseOut],
+                       animations: {
+                        
+                        self.frame = ending
+        },
+                       completion: nil )
+    }
+    
+    @objc func spawnCardV2(_ starting: CGRect, delay: Double) {
+        let ending = self.frame
+        currentCard.isFaceUp = false
+        UIView.transition(with: self,
+                          duration: 0.0,
+                          options: [.transitionFlipFromLeft],
+                          animations: {
+                            self.isFaceUp = !self.isFaceUp
+        },
+                          completion: { Void in() }
+        )
+        UIView.animate(withDuration: 0,
+                       delay: 0,
+                       options: [.curveEaseOut],
+                       animations: {
+                        
+                        self.frame = starting
+        },
+                       completion: nil )
+        UIView.animate(withDuration: 0.3,
+                       delay: delay,
+                       options: [.curveEaseOut],
+                       animations: {
+                        
+                        self.frame = ending
+        },
+                       completion: { finished in
+                        UIView.transition(with: self,
+                                          duration: 0.5,
+                                          options: [.transitionFlipFromLeft],
+                                          animations: {
+                                            self.isFaceUp = !self.isFaceUp
+                        },
+                                          completion: { Void in() }
+                        )
+        } )
+    }
+    
+    @objc func flipCardFunction() {
+            UIView.transition(with: self,
+                              duration: 0.5,
+                              options: [.transitionFlipFromLeft],
+                              animations: {
+                                self.isFaceUp = !self.isFaceUp
+            },
+                              completion: { Void in() }
+            )
+            //cardDelegate?.chooseCard(index!)
+    }
     
     @objc func spawnCardSequential(initial: CGPoint, _ delay: Double) {
         spawnCard(initial: initial, delay: delay)
@@ -79,16 +155,7 @@ class SetCardView: UIView
             break
         }
     }
-    
-    @objc func tapCardV3(_ recognizer: UITapGestureRecognizer) {
-        switch recognizer.state {
-        case .ended:
-            
-            print("hi")
-        default:
-            break
-        }
-    }
+
     
     @objc func tapCardV2(_ recognizer: UITapGestureRecognizer) {
         switch recognizer.state {
@@ -138,7 +205,7 @@ class SetCardView: UIView
                 },
                                   completion: { Void in() }
                 )
-                cardDelegate?.chooseCard(index!)
+                //cardDelegate?.chooseCard(index!)
             }
         default:
             break
@@ -152,6 +219,7 @@ class SetCardView: UIView
         super.layoutSubviews()
         
         self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(chooseCard(_:))))
+        //self.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCardFunction(_:))))
 
     }
     

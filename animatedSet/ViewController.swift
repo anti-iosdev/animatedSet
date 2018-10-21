@@ -41,11 +41,13 @@ class ViewController: UIViewController, ButtonDelegate {
         
     }
     @objc func drawButtonWasPressed() {
-        print("drawButton @ viewcontroller")
+        // print("drawButton @ viewcontroller")
+        game.drawButtonMaster()
+        updateViewFromModel()
     }
     
     @objc func chooseCard(_ index: Int) {
-        print("card: \(index) @ viewcontroller")
+        //print("card: \(index) @ viewcontroller")
         game.chooseCard(at: index)
         updateViewFromModel()
     }

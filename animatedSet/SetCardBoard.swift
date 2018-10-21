@@ -44,8 +44,23 @@ class SetCardBoard: UIView, CardDelegate {
     // Card Configuration
     
     var cardViews = [SetCardView]()
-
     var spawnTracker = [Int]()
+    var startingPositions = [SetCardView]()
+    
+    var positionIndexTracker = [Int]()
+    var positionDict = [Int:CGRect]()
+    var newPositionDict = [Int:SetCardView]()
+    
+    //-------------------------------------------------------------
+    // Positioning Code
+    
+    func updatePositionDict() {
+        for index in positionIndexTracker {
+            positionDict[index] = newPositionDict[index]!.frame
+        }
+    }
+    
+    var cardAnimationDelay = 0.0
     
     func configureCardView(_ rect: CGRect) {
         let cardView = SetCardView(frame: rect)
@@ -54,9 +69,21 @@ class SetCardBoard: UIView, CardDelegate {
         cardView.currentCard = currentCard
         cardView.backgroundColor = UIColor.clear
         cardView.cardDelegate = self
-        
         addSubview(cardView)
-        cardViews.append(cardView)
+        
+        if let position = positionDict[cardView.index!] {
+            cardView.moveCard(position, delay: 0.0)
+            positionDict[cardView.index!] = cardView.frame
+            //cardAnimationDelay = cardAnimationDelay + 0.1
+        } else {
+            cardView.spawnCardV2(dealButtonFrame!, delay: cardAnimationDelay)
+            //cardView.moveCard(dealButtonFrame!, delay: cardAnimationDelay)
+            positionDict[cardView.index!] = cardView.frame
+            cardAnimationDelay = cardAnimationDelay + 0.1
+        }
+        
+        //positionIndexTracker.append(cardView.index!)
+        //newPositionDict[cardView.index!] = cardView
     }
     
     func configureAllCardViews() {
@@ -76,85 +103,55 @@ class SetCardBoard: UIView, CardDelegate {
         cardView.index = currentIndex
         cardView.currentCard = currentCard
         cardView.backgroundColor = UIColor.clear
-        //cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(flipCard(_:))))
-        //cardView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tapCard(_:))))
         cardView.cardDelegate = self
         
         addSubview(cardView)
-        cardViews.append(cardView)
+        for index in cardViews.indices {
+            if cardViews[index].index == currentIndex {
+                cardViews[index] = cardView
+            } else {
+                cardViews.append(cardView)
+            }
+        }
     }
     
-    func nextCardDeck() -> SetCard? {
+    func configureAllCardViewsV2() {
+        var validCards = [Int]()
         for index in deck.indices {
             if deck[index].isFaceUp, !deck[index].isMatched {
-                return deck[index]
+                validCards.append(index)
             }
         }
-        return nil
-    }
-
-    func updateCardViewFrame(_ rect: CGRect) {
-        if let index = currentIndex {
-            cardViews[index].frame = rect
-        }
-    }
-
-    func updateCardViewProperties() {
-        for cardView in cardViews {
-            for index in deck.indices {
-                if cardView.index == index {
-                    cardView.currentCard = deck[index]
-                }
-            }
-        }
-    }
-    func deleteMatchedFromCardViews() {
-        var cardViewsReplacement = [SetCardView]()
-        for index in cardViews.indices {
-            if !cardViews[index].currentCard.isMatched {
-                cardViewsReplacement.append(cardViews[index])
-            } else {
-                cardViews[index].removeFromSuperview()
-            }
-        }
-        cardViews = cardViewsReplacement
-    }
-    func updateAllCardViewFrames() {
-//        for cardView in cardViews {
-//            for index in 0..<cardGrid.cellCount {
-//                if let rect = cardGrid[index] {
-//                    cardView.frame = rect
-//                }
-//            }
-//        }
-        for index in 0..<cardGrid.cellCount {
-            if index < cardViews.count {
+        if validCards.count > 0 {
+            for index in validCards.indices {
                 if let rect = cardGrid[index] {
-                    cardViews[index].frame = rect
+                    currentIndex = validCards[index]
+                    configureCardView(rect)
                 }
             }
         }
     }
-    
     
     //-------------------------------------------------------------
     // Laying Out Subviews
 
+    var dealButtonFrame: CGRect?
+    var cardSize: CGSize?
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        
+        //// Testing
+        for view in self.subviews{
+            view.removeFromSuperview()
+        }
+        
+        
         
         // Button setup
         let layout = Grid.Layout.dimensions(rowCount: 7, columnCount: 1)
         let cardGridInitial = Grid(layout: layout, frame: bounds)
         
-        if let buttonZone = cardGridInitial[6] {
-            let layout = Grid.Layout.dimensions(rowCount: 1, columnCount: 2)
-            let buttonGrid = Grid(layout: layout, frame: buttonZone)
-            configureButton(buttonGrid[0]!)
-        }
-        
-        // Grid setup
         let cardBoardGridWidth = bounds.width
         let cardBoardGridHeight = bounds.height*6/7
         
@@ -162,17 +159,57 @@ class SetCardBoard: UIView, CardDelegate {
         
         // initialize the Grid whenever the layout changes
         cardGrid = Grid(layout: cardGridLayout, frame: cardBoardGrid)
-        cardGrid.cellCount = deck.filter() { $0.isFaceUp }.count
+        cardGrid.cellCount = deck.filter() { $0.isFaceUp && !$0.isMatched }.count
         
-        //configureAllCardViews()
-
-        if cardViews.count == 0 {
-            configureAllCardViews()
-        } else {
-            updateCardViewProperties()
-            deleteMatchedFromCardViews()
-            updateAllCardViewFrames()
+        cardSize = cardGrid.cellSize
+        
+        if let buttonZone = cardGridInitial[6] {
+            let layout = Grid.Layout.dimensions(rowCount: 1, columnCount: 2)
+            let buttonGrid = Grid(layout: layout, frame: buttonZone)
+            
+            if let leftButtonRect = buttonGrid[0], let size = cardSize {
+                let buttonLeftCenterPoint = CGPoint(x: leftButtonRect.midX-cardSize!.width/2, y: leftButtonRect.midY-cardSize!.height/2)
+                dealButtonFrame = dealButtonSetup(locationPoint: buttonLeftCenterPoint, rectSize: size)
+            }
+            
+            //buttonLeftCenterPoint = CGPoint(x: buttonGrid[0]., y: <#T##CGFloat#>
+            
+            //dealButtonFrame = dealButtonSetup(locationPoint: (buttonGrid[0]?.origin)!, rectSize: cardSize!)
+            
+            //configureButton(buttonGrid[0]!)
+            //dealButtonFrame = buttonGrid[0]
         }
+        
+        configureAllCardViewsV2()
+        updatePositionDict()
+        cardAnimationDelay = 0
+    }
+    
+    func dealButtonSetup(locationPoint: CGPoint, rectSize: CGSize) -> CGRect {
+//        let rectWidth = rectSize.width
+//        let rectHeight = rect.size.height
+        let smallConst = CGFloat(0.4)
+        
+        func smallerSize() -> CGFloat {
+            if rectSize.width > rectSize.height*2 {
+                return rectSize.height
+            } else {
+                return rectSize.width*smallConst
+            }
+        }
+        
+        let rect = CGRect(origin: locationPoint, size: rectSize)
+        
+        button.showsTouchWhenHighlighted = true
+        button.frame = rect
+        button.backgroundColor = UIColor.blue
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: smallerSize()/2)
+        button.setTitle("Deal", for: UIControl.State.normal)
+        button.addTarget(self, action: #selector(drawButtonWasPressed), for: .touchUpInside)
+        
+        addSubview(button)
+        
+        return rect
     }
     
     //-------------------------------------------------------------
@@ -180,6 +217,10 @@ class SetCardBoard: UIView, CardDelegate {
     
     let cornerPoint = CGPoint(x: 0, y: 0)
     let spawnCardAnimationDuration = 0.3
+    
+    @objc func moveCard() {
+        
+    }
     
     @objc func spawnCardSequential() {
         var delay = 0.0
@@ -236,7 +277,6 @@ class SetCardBoard: UIView, CardDelegate {
     lazy var button = UIButton()
     
     func configureButton(_ rect: CGRect) {
-        //let buttonRect = CGRect(x: 0, y: 0, width: 100, height: 100)
         let rectWidth = rect.size.width
         let rectHeight = rect.size.height
         let smallConst = CGFloat(0.4)

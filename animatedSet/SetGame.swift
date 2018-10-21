@@ -26,15 +26,31 @@ class SetGame
         }
     }
     
-    func resetButton() {
-        if uglyColorSolution == 1 {
-            uglyColorSolution = 0
-            activeIndices = nil
-            for index in cards.indices {
-                cards[index].isSelected = false
-                cards[index].isMatched = false
-            }
+    func drawButtonMaster() {
+        drawButton()
+        drawButton()
+        drawButton()
+    }
+    
+    var drawCounter = 0
+    
+    func drawButton() {
+        if drawCounter < cards.count {
+            cards[drawCounter].isFaceUp = true
+            drawCounter += 1
         }
+        
+//        for index in cards.indices {
+//            if index > 36 {
+//                cards[47].isFaceUp = true
+//                return true
+//            }
+//            if !cards[index].isFaceUp, !cards[index].isMatched {
+//                cards[index].isFaceUp = true
+//                return true
+//            }
+//        }
+//        return false
     }
     
     func chooseCard(at index: Int) {
@@ -66,7 +82,7 @@ class SetGame
                             }
                             
                             //cards[index].isSelected = false
-                            print("A set was found!")
+                            //print("A set was found!")
                             uglyColorSolution = 1
                             matchSuccess = 1
                             score += 5
@@ -186,20 +202,22 @@ class SetGame
     
     func shuffleCardDebug() {
         for index in deck.cards.indices {
-            var card = deck.cards[index]
-            if index >= 36 {
-                card.isFaceUp = false
-                cards.append(card)
+            //var card = deck.cards[index]
+            if index >= 24 {
+                //cards[index] = false
+                deck.cards[index].isFaceUp = false
+                cards.append(deck.cards[index])
             }
             else {
-                cards.append(card)
+                cards.append(deck.cards[index])
+                drawCounter += 1
             }
         }
     }
     
     func shuffleCard() {
         for index in deck.cards.indices {
-            if index >= 36 {
+            if index >= 12 {
                 var cardTemp = deck.draw()!
                 cardTemp.isFaceUp = false
                 cards.append(cardTemp)
