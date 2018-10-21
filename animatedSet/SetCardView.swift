@@ -120,6 +120,73 @@ class SetCardView: UIView
             //cardDelegate?.chooseCard(index!)
     }
     
+    @objc func despawnCard(_ ending: CGRect, delay: Double) {
+        //let ending = self.frame
+//        UIView.transition(with: self,
+//                          duration: 0.0,
+//                          options: [.transitionFlipFromLeft],
+//                          animations: {
+//                            self.isFaceUp = !self.isFaceUp
+//        },
+//                          completion: { Void in() }
+//        )
+//        UIView.animate(withDuration: 0,
+//                       delay: 0,
+//                       options: [.curveEaseOut],
+//                       animations: {
+//
+//                        self.frame = ending
+//        },
+//                       completion: nil )
+//        print("despawning")
+//        UIView.animate(withDuration: 0.3,
+//                       delay: delay,
+//                       options: [.curveEaseOut],
+//                       animations: {
+//
+//                        self.frame = ending
+//        },
+//                       completion: { (position) in
+//                        UIView.transition(with: self,
+//                                          duration: 0.5,
+//                                          options: [.transitionFlipFromLeft],
+//                                          animations: {
+//                                            self.isFaceUp = !self.isFaceUp
+//                        },
+//                                          completion: nil
+//                        )
+//        } )
+        
+        UIView.transition(with: self,
+                          duration: 0.3,
+                          options: [.transitionFlipFromLeft],
+                          animations: {
+                            self.isFaceUp = !self.isFaceUp
+        },
+                          completion: { finished in
+                            UIView.animate(withDuration: 0.5,
+                                           delay: delay,
+                                           options: [.curveEaseOut],
+                                           animations: {
+
+                                            self.frame = ending
+                            },
+                                           completion: nil)
+        }
+        )
+        
+        
+        
+        
+//        UIView.transition(with: self,
+//                          duration: 0.5,
+//                          options: [.transitionFlipFromLeft],
+//                          animations: {
+//                            self.isFaceUp = !self.isFaceUp
+//        },
+//                          completion: nil)
+    }
+    
     @objc func spawnCardSequential(initial: CGPoint, _ delay: Double) {
         spawnCard(initial: initial, delay: delay)
     }

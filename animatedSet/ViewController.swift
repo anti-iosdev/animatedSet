@@ -57,6 +57,7 @@ class ViewController: UIViewController, ButtonDelegate {
     
     func updateViewFromModel() {
         setCardView.deck = game.cards
+        //setCardView.sets = game.score
     }
     
     

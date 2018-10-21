@@ -24,7 +24,9 @@ class SetCardBoard: UIView, CardDelegate {
     var deck = [SetCard]() { didSet { setNeedsDisplay(); setNeedsLayout() } }
     
     var cardGridLayout = Grid.Layout.aspectRatio(Consts.cardAspectRatio)  { didSet { setNeedsDisplay(); setNeedsLayout() } }
-    lazy var cardGrid = Grid(layout: cardGridLayout, frame: bounds) 
+    lazy var cardGrid = Grid(layout: cardGridLayout, frame: bounds)
+    
+    var sets = 0
     
     //-------------------------------------------------------------
     // Defining Variables
@@ -44,12 +46,17 @@ class SetCardBoard: UIView, CardDelegate {
     // Card Configuration
     
     var cardViews = [SetCardView]()
-    var spawnTracker = [Int]()
     var startingPositions = [SetCardView]()
     
     var positionIndexTracker = [Int]()
     var positionDict = [Int:CGRect]()
     var newPositionDict = [Int:SetCardView]()
+    
+    var positionDictCopy = [Int:SetCardView]()
+    var donePile = [SetCardView]()
+    
+    var oldSpawns = [Int]()
+    var newSpawns = [Int]()
     
     //-------------------------------------------------------------
     // Positioning Code
@@ -57,6 +64,41 @@ class SetCardBoard: UIView, CardDelegate {
     func updatePositionDict() {
         for index in positionIndexTracker {
             positionDict[index] = newPositionDict[index]!.frame
+            //positionDictCopy[index] = newPositionDict[index]
+        }
+    }
+    
+    // index of old cards used
+    // index of new cards used
+    // if old card isn't in new cards, send to score
+    // update old index to new index
+    
+    // returns true if card wasn't taken out
+    
+    func spawnMerger() {
+        oldSpawns = newSpawns
+        newSpawns = []
+    }
+    
+    func spawnCheckerHelper() {
+        for index in oldSpawns {
+            spawnChecker(index)
+        }
+    }
+    
+    func spawnChecker(_ index: Int) {
+        if !newSpawns.contains(index) {
+            // animate going to bin
+            addSubview(positionDictCopy[index]!)
+            positionDictCopy[index]?.despawnCard(scoreDespawnFrame!, delay: 0.0)
+            donePile.append(positionDictCopy[index]!)
+            sets += 1
+        }
+    }
+    
+    func donePileRender() {
+        for view in donePile {
+            addSubview(view)
         }
     }
     
@@ -74,12 +116,14 @@ class SetCardBoard: UIView, CardDelegate {
         if let position = positionDict[cardView.index!] {
             cardView.moveCard(position, delay: 0.0)
             positionDict[cardView.index!] = cardView.frame
-            //cardAnimationDelay = cardAnimationDelay + 0.1
+            positionDictCopy[cardView.index!] = cardView
+            newSpawns.append(cardView.index!)
         } else {
             cardView.spawnCardV2(dealButtonFrame!, delay: cardAnimationDelay)
-            //cardView.moveCard(dealButtonFrame!, delay: cardAnimationDelay)
             positionDict[cardView.index!] = cardView.frame
+            positionDictCopy[cardView.index!] = cardView
             cardAnimationDelay = cardAnimationDelay + 0.1
+            newSpawns.append(cardView.index!)
         }
         
         //positionIndexTracker.append(cardView.index!)
@@ -137,6 +181,8 @@ class SetCardBoard: UIView, CardDelegate {
 
     var dealButtonFrame: CGRect?
     var cardSize: CGSize?
+    var scoreDespawnFrame: CGRect?
+    var setLabel: UILabel?
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -146,7 +192,7 @@ class SetCardBoard: UIView, CardDelegate {
             view.removeFromSuperview()
         }
         
-        
+        donePileRender()
         
         // Button setup
         let layout = Grid.Layout.dimensions(rowCount: 7, columnCount: 1)
@@ -164,26 +210,96 @@ class SetCardBoard: UIView, CardDelegate {
         cardSize = cardGrid.cellSize
         
         if let buttonZone = cardGridInitial[6] {
-            let layout = Grid.Layout.dimensions(rowCount: 1, columnCount: 2)
+            let layout = Grid.Layout.dimensions(rowCount: 1, columnCount: 3)
             let buttonGrid = Grid(layout: layout, frame: buttonZone)
             
             if let leftButtonRect = buttonGrid[0], let size = cardSize {
                 let buttonLeftCenterPoint = CGPoint(x: leftButtonRect.midX-cardSize!.width/2, y: leftButtonRect.midY-cardSize!.height/2)
-                dealButtonFrame = dealButtonSetup(locationPoint: buttonLeftCenterPoint, rectSize: size)
+                let cardSpawnFrame = CGRect(origin: buttonLeftCenterPoint, size: size)
+                dealButtonFrame = cardSpawnFrame
+                dealButtonSetupV2(leftButtonRect)
             }
             
-            //buttonLeftCenterPoint = CGPoint(x: buttonGrid[0]., y: <#T##CGFloat#>
-            
-            //dealButtonFrame = dealButtonSetup(locationPoint: (buttonGrid[0]?.origin)!, rectSize: cardSize!)
-            
-            //configureButton(buttonGrid[0]!)
-            //dealButtonFrame = buttonGrid[0]
+            if let rightButtonRect = buttonGrid[1], let despawnRect = buttonGrid[2] {
+                
+                let despawnCardLayout = Grid.Layout.aspectRatio(Consts.cardAspectRatio)
+                var despawnCardGrid = Grid(layout: despawnCardLayout, frame: despawnRect)
+                despawnCardGrid.cellCount = 1
+                scoreDespawnFrame = despawnCardGrid[0]
+                
+                setLabel = scoreButtonSetup(rightButtonRect)
+                
+                //dealButtonFrame = cardSpawnFrame
+                //dealButtonSetupV2(leftButtonRect)
+            }
         }
         
         configureAllCardViewsV2()
         updatePositionDict()
         cardAnimationDelay = 0
+        
+        spawnCheckerHelper()
+        spawnMerger()
+        
+        setLabel!.text = "Sets: \(sets)"
+        
     }
+    
+
+    func scoreButtonUpdate() {
+        
+    }
+    
+    func scoreButtonSetup(_ labelSize: CGRect) -> UILabel {
+        let smallConst = CGFloat(0.4)
+        
+        func smallerSize() -> CGFloat {
+            if labelSize.width > labelSize.height*2 {
+                return labelSize.height
+            } else {
+                return labelSize.width*smallConst
+            }
+        }
+        
+        let rect = labelSize
+        
+        let label = UILabel()
+        label.frame = rect
+        label.backgroundColor = UIColor.blue
+        label.text = "Sets: \(sets)"
+        label.textAlignment = .center
+        label.textColor = UIColor.white
+        label.font = UIFont.boldSystemFont(ofSize: smallerSize()/2)
+        
+        addSubview(label)
+        return label
+    }
+    
+    func dealButtonSetupV2(_ buttonRect: CGRect) {
+        //        let rectWidth = rectSize.width
+        //        let rectHeight = rect.size.height
+        let smallConst = CGFloat(0.4)
+        
+        func smallerSize() -> CGFloat {
+            if buttonRect.width > buttonRect.height*2 {
+                return buttonRect.height
+            } else {
+                return buttonRect.width*smallConst
+            }
+        }
+        
+        let rect = buttonRect
+        
+        button.showsTouchWhenHighlighted = true
+        button.frame = rect
+        button.backgroundColor = UIColor.blue
+        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: smallerSize()/2)
+        button.setTitle("Deal", for: UIControl.State.normal)
+        button.addTarget(self, action: #selector(drawButtonWasPressed), for: .touchUpInside)
+        
+        addSubview(button)
+        
+        }
     
     func dealButtonSetup(locationPoint: CGPoint, rectSize: CGSize) -> CGRect {
 //        let rectWidth = rectSize.width
