@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, ButtonDelegate {
+class SetGameViewController: UIViewController, ButtonDelegate {
 
     //-------------------------------------------------------------
     // Definitions

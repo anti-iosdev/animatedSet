@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E93171EC21734BED00E43449 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93171EB21734BED00E43449 /* AppDelegate.swift */; };
-		E93171EE21734BED00E43449 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93171ED21734BED00E43449 /* ViewController.swift */; };
+		E93171EE21734BED00E43449 /* SetGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93171ED21734BED00E43449 /* SetGameViewController.swift */; };
 		E93171F121734BED00E43449 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E93171EF21734BED00E43449 /* Main.storyboard */; };
 		E93171F321734BEE00E43449 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E93171F221734BEE00E43449 /* Assets.xcassets */; };
 		E93171F621734BEE00E43449 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E93171F421734BEE00E43449 /* LaunchScreen.storyboard */; };
@@ -24,12 +24,13 @@
 		E9645C7E217D1ED8009ADED7 /* Concentration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9645C7D217D1ED8009ADED7 /* Concentration.swift */; };
 		E9645C80217D1EEC009ADED7 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9645C7F217D1EEC009ADED7 /* Card.swift */; };
 		E976CF65217DC2FE006E4C57 /* ConcenterationThemeChooserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E976CF64217DC2FE006E4C57 /* ConcenterationThemeChooserViewController.swift */; };
+		E976CF67217DD2C1006E4C57 /* GameChooserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E976CF66217DD2C1006E4C57 /* GameChooserViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		E93171E821734BED00E43449 /* animatedSet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = animatedSet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E93171EB21734BED00E43449 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		E93171ED21734BED00E43449 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E93171ED21734BED00E43449 /* SetGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameViewController.swift; sourceTree = "<group>"; };
 		E93171F021734BED00E43449 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E93171F221734BEE00E43449 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E93171F521734BEE00E43449 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -46,6 +47,7 @@
 		E9645C7D217D1ED8009ADED7 /* Concentration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Concentration.swift; sourceTree = "<group>"; };
 		E9645C7F217D1EEC009ADED7 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		E976CF64217DC2FE006E4C57 /* ConcenterationThemeChooserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcenterationThemeChooserViewController.swift; sourceTree = "<group>"; };
+		E976CF66217DD2C1006E4C57 /* GameChooserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameChooserViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,7 +80,8 @@
 		E93171EA21734BED00E43449 /* animatedSet */ = {
 			isa = PBXGroup;
 			children = (
-				E93171ED21734BED00E43449 /* ViewController.swift */,
+				E976CF66217DD2C1006E4C57 /* GameChooserViewController.swift */,
+				E93171ED21734BED00E43449 /* SetGameViewController.swift */,
 				E931720221748D5900E43449 /* SetCardBoard.swift */,
 				E931720A2174D8E400E43449 /* SetCardView.swift */,
 				E96374352179E9240032877D /* SetGame.swift */,
@@ -88,8 +91,8 @@
 				E931720421748D7500E43449 /* Grid.swift */,
 				E93171EF21734BED00E43449 /* Main.storyboard */,
 				E93171F721734BEE00E43449 /* Info.plist */,
-				E9645C7B217D1EAA009ADED7 /* ConcentrationViewController.swift */,
 				E976CF64217DC2FE006E4C57 /* ConcenterationThemeChooserViewController.swift */,
+				E9645C7B217D1EAA009ADED7 /* ConcentrationViewController.swift */,
 				E9645C7D217D1ED8009ADED7 /* Concentration.swift */,
 				E9645C7F217D1EEC009ADED7 /* Card.swift */,
 				E93171FD21734C0000E43449 /* Supporting Files */,
@@ -186,12 +189,13 @@
 				E9645C7C217D1EAA009ADED7 /* ConcentrationViewController.swift in Sources */,
 				E931720321748D5900E43449 /* SetCardBoard.swift in Sources */,
 				E9317201217372DE00E43449 /* SetCardDeck.swift in Sources */,
-				E93171EE21734BED00E43449 /* ViewController.swift in Sources */,
+				E93171EE21734BED00E43449 /* SetGameViewController.swift in Sources */,
 				E976CF65217DC2FE006E4C57 /* ConcenterationThemeChooserViewController.swift in Sources */,
 				E9645C80217D1EEC009ADED7 /* Card.swift in Sources */,
 				E93171EC21734BED00E43449 /* AppDelegate.swift in Sources */,
 				E931720B2174D8E400E43449 /* SetCardView.swift in Sources */,
 				E931720521748D7500E43449 /* Grid.swift in Sources */,
+				E976CF67217DD2C1006E4C57 /* GameChooserViewController.swift in Sources */,
 				E93172092174D24F00E43449 /* CardBehavior.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,6 +343,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8A9DF264JZ;
 				INFOPLIST_FILE = animatedSet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -356,6 +361,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 8A9DF264JZ;
 				INFOPLIST_FILE = animatedSet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
