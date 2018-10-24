@@ -26,7 +26,9 @@ class SetCardBoard: UIView, CardDelegate {
     var cardGridLayout = Grid.Layout.aspectRatio(Consts.cardAspectRatio)  { didSet { setNeedsDisplay(); setNeedsLayout() } }
     lazy var cardGrid = Grid(layout: cardGridLayout, frame: bounds)
     
+    var uglyColorSolution = 0
     var sets = 0
+    lazy var trueSets = sets/3
     
     //-------------------------------------------------------------
     // Defining Variables
@@ -111,6 +113,7 @@ class SetCardBoard: UIView, CardDelegate {
         cardView.currentCard = currentCard
         cardView.backgroundColor = UIColor.clear
         cardView.cardDelegate = self
+        cardView.uglyColorSolution = uglyColorSolution
         addSubview(cardView)
         
         if let position = positionDict[cardView.index!] {
@@ -241,7 +244,7 @@ class SetCardBoard: UIView, CardDelegate {
         spawnCheckerHelper()
         spawnMerger()
         
-        setLabel!.text = "Sets: \(sets)"
+        setLabel!.text = "Sets: \(sets/3)"
         
     }
     
@@ -266,7 +269,7 @@ class SetCardBoard: UIView, CardDelegate {
         let label = UILabel()
         label.frame = rect
         label.backgroundColor = UIColor.blue
-        label.text = "Sets: \(sets)"
+        label.text = "Sets: \(sets/3)"
         label.textAlignment = .center
         label.textColor = UIColor.white
         label.font = UIFont.boldSystemFont(ofSize: smallerSize()/2)

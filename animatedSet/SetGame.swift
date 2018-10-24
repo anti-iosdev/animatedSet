@@ -224,13 +224,14 @@ class SetGame
             }
             else {
                 cards.append(deck.draw()!)
+                drawCounter += 1
             }
         }
     }
     
     init(numberOfTotalSlots: Int) {
 
-        shuffleCardDebug()
+        shuffleCard()
     }
 }
 

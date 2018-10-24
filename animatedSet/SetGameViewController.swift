@@ -57,6 +57,7 @@ class SetGameViewController: UIViewController, ButtonDelegate {
     
     func updateViewFromModel() {
         setCardView.deck = game.cards
+        setCardView.uglyColorSolution = game.uglyColorSolution
         //setCardView.sets = game.score
     }
     

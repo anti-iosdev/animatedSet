@@ -21,7 +21,10 @@ class SetCardView: UIView
     var currentCard: SetCard! { didSet { setNeedsDisplay(); setNeedsLayout() } }
     var index: Int?
     var cardDelegate: CardDelegate?
+    var uglyColorSolution = 0 { didSet { setNeedsDisplay(); setNeedsLayout() } }
     //var isSpawned: Bool = false
+    
+    
     
     func redraw() {
         setNeedsDisplay()
@@ -483,14 +486,34 @@ class SetCardView: UIView
     
     func isSelected() {
         if currentCard.isSelected == true {
-            let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
-            roundedRect.addClip()
-            UIColor.white.setFill()
-            roundedRect.fill()
-            
-            UIColor.black.setStroke()
-            roundedRect.lineWidth = 5.0
-            roundedRect.stroke()
+            if uglyColorSolution == 0 {
+                let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+                roundedRect.addClip()
+                UIColor.white.setFill()
+                roundedRect.fill()
+                
+                UIColor.black.setStroke()
+                roundedRect.lineWidth = 5.0
+                roundedRect.stroke()
+            } else if uglyColorSolution == 1 {
+                let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+                roundedRect.addClip()
+                UIColor.green.setFill()
+                roundedRect.fill()
+                
+                UIColor.clear.setStroke()
+                roundedRect.lineWidth = 5.0
+                roundedRect.stroke()
+            } else if uglyColorSolution == 2 {
+                let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+                roundedRect.addClip()
+                UIColor.white.setFill()
+                roundedRect.fill()
+                
+                UIColor.red.setStroke()
+                roundedRect.lineWidth = 5.0
+                roundedRect.stroke()
+            }
         } else {
             let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
             roundedRect.addClip()
